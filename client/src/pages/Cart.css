@@ -1,0 +1,12 @@
+.cart-container {
+  padding: 40px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  background: #f8f8f8;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}

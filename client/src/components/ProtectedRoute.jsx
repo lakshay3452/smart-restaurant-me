@@ -1,10 +1,10 @@
 import { Navigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
-  const isAdmin = true; // Temporary allow access
+  const isAdmin = localStorage.getItem("adminAuth") === "true";
 
   if (!isAdmin) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin-login" replace />;
   }
 
   return children;

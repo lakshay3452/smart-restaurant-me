@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X } from "lucide-react";
+import { ShoppingCart, User, Menu, X, LogIn, LogOut } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,6 +11,8 @@ export default function Navbar() {
   const navRef = useRef(null);
 
   const cartCount = cartItems.reduce((a, b) => a + b.quantity, 0);
+  const isLoggedIn = !!localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const goHome = () => {
     if (location.pathname === "/") {
@@ -18,6 +20,13 @@ export default function Navbar() {
     } else {
       navigate("/");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+    setMobileMenuOpen(false);
   };
 
   useEffect(() => {
@@ -48,7 +57,7 @@ export default function Navbar() {
           <User
             size={22}
             className="cursor-pointer hover:text-amber-400 transition"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate(localStorage.getItem("token") ? "/profile" : "/login")}
           />
 
           {/* Brand */}
@@ -92,6 +101,41 @@ export default function Navbar() {
             <ShoppingCart size={18} />
             Cart {cartCount > 0 && `(${cartCount})`}
           </button>
+
+          {isLoggedIn ? (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate("/profile")}
+                className="hover:text-amber-400 flex items-center gap-1"
+              >
+                <User size={18} />
+                {user?.name?.split(" ")[0] || "Profile"}
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600/80 hover:bg-red-600 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition"
+              >
+                <LogOut size={15} />
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/login")}
+                className="hover:text-amber-400 flex items-center gap-1"
+              >
+                <LogIn size={18} />
+                Login
+              </button>
+              <button
+                onClick={() => navigate("/register")}
+                className="bg-amber-500 text-black px-4 py-1.5 rounded-lg text-sm font-semibold hover:scale-105 transition"
+              >
+                Sign Up
+              </button>
+            </div>
+          )}
 
         </div>
 
@@ -152,6 +196,59 @@ export default function Navbar() {
               <ShoppingCart size={18} />
               Cart {cartCount > 0 && `(${cartCount})`}
             </button>
+
+            {isLoggedIn ? (
+              <>
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="hover:text-amber-400 flex items-center gap-2 text-left"
+                >
+                  <User size={18} />
+                  {user?.name || "Profile"}
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/orders");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="hover:text-amber-400 text-left"
+                >
+                  My Orders
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="bg-red-600/80 hover:bg-red-600 px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition w-fit"
+                >
+                  <LogOut size={15} />
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    navigate("/login");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="hover:text-amber-400 flex items-center gap-2 text-left"
+                >
+                  <LogIn size={18} />
+                  Login
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/register");
+                    setMobileMenuOpen(false);
+                  }}
+                  className="bg-amber-500 text-black px-4 py-2 rounded-lg text-sm font-semibold w-fit"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

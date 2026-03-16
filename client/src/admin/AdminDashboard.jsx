@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
 
   const [orders, setOrders] = useState([]);
   const lastCount = useRef(0);
+  const navigate = useNavigate();
 
   const fetchOrders = async () => {
 
@@ -65,11 +67,31 @@ export default function AdminDashboard() {
 
   return (
 
-    <div className="min-h-screen bg-black text-white pt-28 px-6">
+    <div className="min-h-screen bg-black text-white pt-6 px-6">
 
-      <h1 className="text-3xl font-serif mb-10">
-        Admin Dashboard
-      </h1>
+      {/* Admin Nav */}
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-serif">
+          Admin Dashboard
+        </h1>
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate("/admin-menu")}
+            className="bg-amber-500 text-black px-4 py-2 rounded-lg font-semibold"
+          >
+            Manage Menu
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem("adminAuth");
+              navigate("/admin-login");
+            }}
+            className="bg-red-600 px-4 py-2 rounded-lg font-semibold"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
       {Array.isArray(orders) && orders.length === 0 && (
         <p>No Orders Yet</p>
@@ -105,7 +127,7 @@ export default function AdminDashboard() {
             </div>
 
             <p className="mt-4 text-amber-400 font-semibold">
-              Total ₹{order.total}
+              Total ₹{order.totalAmount || order.total}
             </p>
 
             <p className={`mt-2 font-semibold ${getStatusColor(order.status)}`}>

@@ -26,7 +26,7 @@ export default function MobileBottomNav() {
         Menu
       </button>
 
-      <button onClick={() => navigate("/tracking")} className="flex flex-col items-center text-xs text-gray-300">
+      <button onClick={() => navigate("/orders")} className="flex flex-col items-center text-xs text-gray-300">
         <Clock size={20} />
         Orders
       </button>
@@ -36,7 +36,7 @@ export default function MobileBottomNav() {
         Cart
       </button>
 
-      <button onClick={() => navigate("/login")} className="flex flex-col items-center text-xs text-gray-300">
+      <button onClick={() => navigate(localStorage.getItem("token") ? "/profile" : "/login")} className="flex flex-col items-center text-xs text-gray-300">
         <User size={20} />
         Profile
       </button>

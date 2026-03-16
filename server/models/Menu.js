@@ -1,10 +1,12 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const menuSchema = new mongoose.Schema({
   name: String,
   price: Number,
   description: String,
-  image: String
-});
+  image: String,
+  category: { type: String, default: "Other" },
+  available: { type: Boolean, default: true }
+}, { timestamps: true });
 
-export default mongoose.model("Menu", menuSchema);
+module.exports = mongoose.model("Menu", menuSchema);

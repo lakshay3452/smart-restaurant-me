@@ -2,6 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
+import toast from "react-hot-toast"
 
 export default function Checkout() {
 
@@ -34,7 +35,7 @@ export default function Checkout() {
 
     // Final validation
     if(phone.length !== 10){
-      alert("Phone number must be exactly 10 digits")
+      toast.error("Phone number must be exactly 10 digits")
       return
     }
 
@@ -48,15 +49,26 @@ export default function Checkout() {
         total: totalPrice
       })
 
-      alert("Order placed successfully")
+      // Save to localStorage for order history
+      const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]")
+      savedOrders.push({
+        id: "ORD" + Date.now(),
+        date: new Date().toLocaleDateString(),
+        items: cartItems,
+        total: totalPrice,
+        status: "Pending"
+      })
+      localStorage.setItem("orders", JSON.stringify(savedOrders))
+
+      toast.success("Order placed successfully!")
 
       clearCart()
 
-      navigate("/")
+      navigate("/success")
 
     }catch(err){
 
-      alert("Order Failed")
+      toast.error("Order Failed")
 
     }
 

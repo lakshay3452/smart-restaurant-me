@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
+    name: String,
+    phone: String,
+    address: String,
     items: [
       {
         name: String,
@@ -13,7 +16,7 @@ const orderSchema = new mongoose.Schema(
     totalAmount: Number,
     status: {
       type: String,
-      default: "Preparing",
+      default: "Pending",
     },
   },
   { timestamps: true }

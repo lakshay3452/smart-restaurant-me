@@ -70,7 +70,7 @@ export default function OrderHistory() {
               </div>
 
               <button
-                onClick={() => navigate("/track")}
+                onClick={() => navigate("/tracking")}
                 className="mt-4 bg-amber-500 text-black px-4 py-2 rounded-lg text-sm"
               >
                 Track Order

@@ -100,7 +100,7 @@ function AdminMenu() {
 
         {items.map((item) => (
 
-          <div key={item._id}
+          <div key={item._id || item.id}
             style={{
               background: "#1e1e1e",
               padding: "15px",
@@ -125,7 +125,7 @@ function AdminMenu() {
             <p>₹ {item.price}</p>
 
             <button
-              onClick={() => deleteItem(item._id)}
+              onClick={() => deleteItem(item._id || item.id)}
               style={{
                 background: "red",
                 color: "white",

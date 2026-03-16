@@ -1,69 +1,87 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
 
 import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
 import BottomNavbar from "./components/MobileBottomNav"
+import CartDrawer from "./components/CartDrawer"
+import ProtectedRoute from "./components/ProtectedRoute"
 
 import Home from "./pages/Home"
 import Menu from "./pages/Menu"
 import Cart from "./pages/Cart"
 import Checkout from "./pages/Checkout"
 import Login from "./pages/Login"
+import Register from "./pages/Register"
+import Payment from "./pages/Payment"
+import OrderSuccess from "./pages/OrderSuccess"
+import OrderHistory from "./pages/OrderHistory"
+import Profile from "./pages/Profile"
+import Tracking from "./pages/Tracking"
 import BookTable from "./components/BookTable"
 
 import AdminLogin from "./admin/AdminLogin"
 import AdminDashboard from "./admin/AdminDashboard"
 import AdminMenu from "./admin/AdminMenu"
 
-export default function App() {
+function AppLayout() {
+  const location = useLocation()
+
+  // Hide customer navbar/footer on admin pages
+  const isAdminPage = location.pathname.startsWith("/admin")
 
   return (
-
-    <Router>
-
-      {/* Top Navbar */}
-      <Navbar />
+    <>
+      {/* Top Navbar - only on customer pages */}
+      {!isAdminPage && <Navbar />}
 
       {/* Page Content */}
-      <div className="pt-20 min-h-screen">
-
+      <div className={isAdminPage ? "min-h-screen" : "pt-20 min-h-screen"}>
         <Routes>
 
           {/* Customer Routes */}
-
           <Route path="/" element={<Home />} />
-
           <Route path="/menu" element={<Menu />} />
-
           <Route path="/cart" element={<Cart />} />
-
           <Route path="/checkout" element={<Checkout />} />
-
           <Route path="/login" element={<Login />} />
-
+          <Route path="/register" element={<Register />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/success" element={<OrderSuccess />} />
+          <Route path="/orders" element={<OrderHistory />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/tracking" element={<Tracking />} />
           <Route path="/book-table" element={<BookTable />} />
 
-
           {/* Admin Routes */}
-
           <Route path="/admin-login" element={<AdminLogin />} />
-
-          <Route path="/admin" element={<AdminDashboard />} />
-
-          <Route path="/admin-menu" element={<AdminMenu />} />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin-menu" element={
+            <ProtectedRoute>
+              <AdminMenu />
+            </ProtectedRoute>
+          } />
 
         </Routes>
-
       </div>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer & Mobile Nav - only on customer pages */}
+      {!isAdminPage && <Footer />}
+      {!isAdminPage && <BottomNavbar />}
 
-      {/* Mobile Bottom Navbar */}
-      <BottomNavbar />
-
-    </Router>
-
+      {/* Cart Drawer - only on customer pages */}
+      {!isAdminPage && <CartDrawer />}
+    </>
   )
+}
 
+export default function App() {
+  return (
+    <Router>
+      <AppLayout />
+    </Router>
+  )
 }

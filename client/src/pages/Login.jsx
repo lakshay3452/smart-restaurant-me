@@ -24,7 +24,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/login/send-otp", {
+      await axios.post("/api/auth/login/send-otp", {
         email,
         password,
       });
@@ -70,7 +70,7 @@ export default function Login() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login/verify-otp", {
+      const res = await axios.post("/api/auth/login/verify-otp", {
         email,
         otp,
       });
@@ -90,7 +90,7 @@ export default function Login() {
   const handleResendOTP = async () => {
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/login/send-otp", {
+      await axios.post("/api/auth/login/send-otp", {
         email,
         password,
       });

@@ -12,7 +12,7 @@ export default function AdminDashboard() {
 
     try {
 
-      const res = await axios.get("http://localhost:5000/api/orders/json");
+      const res = await axios.get("/api/orders/json");
 
       const data = res.data.orders || res.data;
 
@@ -44,7 +44,7 @@ export default function AdminDashboard() {
 
     try {
 
-      await axios.put(`http://localhost:5000/api/orders/${id}`, {
+      await axios.put(`/api/orders/${id}`, {
         status
       });
 

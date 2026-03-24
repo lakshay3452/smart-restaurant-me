@@ -30,7 +30,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/register/send-otp", {
+      await axios.post("/api/auth/register/send-otp", {
         name,
         email,
         password,
@@ -77,7 +77,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register/verify-otp", {
+      const res = await axios.post("/api/auth/register/verify-otp", {
         email,
         otp,
       });
@@ -97,7 +97,7 @@ export default function Register() {
   const handleResendOTP = async () => {
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/auth/register/send-otp", {
+      await axios.post("/api/auth/register/send-otp", {
         name,
         email,
         password,

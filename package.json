@@ -1,17 +1,20 @@
 {
-	"name": "restaurant-app",
-	"private": true,
-	"version": "1.0.0",
-	"description": "Smart Restaurant - Full Stack Application",
-	"main": "index.js",
-	"scripts": {
-		"install-all": "npm install && cd client && npm install --legacy-peer-deps && cd ../server && npm install",
-		"dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-		"dev:server": "cd server && npm run dev",
-		"dev:client": "cd client && npm run dev",
-		"build": "cd client && npm run build"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC"
+  "name": "restaurant-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Smart Restaurant - Full Stack Application",
+  "scripts": {
+    "install-all": "npm install && cd client && npm install --legacy-peer-deps && cd ../server && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "vercel-build": "cd client && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rollup": "^4.60.0"
+  }
 }

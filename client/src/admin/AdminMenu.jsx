@@ -21,7 +21,7 @@ fetchItems()
 
 const fetchItems = async()=>{
 try {
-const res = await axios.get("http://localhost:5000/api/menu")
+const res = await axios.get("/api/menu")
 setItems(res.data)
 } catch(error) {
 console.error("Error fetching items:", error)
@@ -36,7 +36,7 @@ const addItem = async(e)=>{
 e.preventDefault()
 
 try {
-await axios.post("http://localhost:5000/api/menu",form)
+await axios.post("/api/menu",form)
 
 fetchItems()
 
@@ -54,7 +54,7 @@ console.error("Error adding item:", error)
 
 const deleteItem = async(id)=>{
 try {
-await axios.delete(`http://localhost:5000/api/menu/${id}`)
+await axios.delete(`/api/menu/${id}`)
 fetchItems()
 } catch(error) {
 console.error("Error deleting item:", error)
@@ -64,7 +64,7 @@ console.error("Error deleting item:", error)
 const toggleAvailability = async(item)=>{
 try {
 await axios.patch(
-`http://localhost:5000/api/menu/${item._id}/toggle`
+`/api/menu/${item._id}/toggle`
 )
 
 fetchItems()
@@ -81,7 +81,7 @@ setForm(item)
 const updateItem = async()=>{
 try {
 await axios.put(
-`http://localhost:5000/api/menu/${editing._id}`,
+`/api/menu/${editing._id}`,
 form
 )
 

@@ -38,7 +38,7 @@ export default function BookTable() {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/reservations", {
+      await axios.post("/api/reservations", {
         name,
         phone,
         guests,

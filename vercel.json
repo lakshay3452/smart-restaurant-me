@@ -1,8 +1,12 @@
 {
-  "buildCommand": "cd client && npm ci --legacy-peer-deps && npm run build",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "cd client && npm install --legacy-peer-deps && npm run build",
   "outputDirectory": "client/dist",
-  "devCommand": "cd client && npm run dev",
-  "env": {
-    "VITE_API_URL": "http://localhost:5001"
-  }
+  "installCommand": "npm install && cd server && npm install && cd ../client && npm install --legacy-peer-deps",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/((?!api).*)", "destination": "/index.html" }
+  ]
 }

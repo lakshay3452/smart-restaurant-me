@@ -42,7 +42,7 @@ export default function Checkout() {
 
     try{
 
-      await axios.post("http://localhost:5000/api/orders",{
+      await axios.post("/api/orders",{
         name,
         email,
         phone,

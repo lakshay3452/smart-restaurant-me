@@ -38,13 +38,16 @@ export default function BookTable() {
     setLoading(true);
 
     try {
-      await axios.post("/api/reservations", {
+      const reservationData = {
         name,
         phone,
         guests,
         date,
         time
-      });
+      };
+      console.log("Sending reservation data:", reservationData);
+      
+      await axios.post("/api/reservations", reservationData);
 
       toast.success("✅ Reservation confirmed!");
       setSuccess(true);
@@ -138,10 +141,11 @@ export default function BookTable() {
 
           {/* Date */}
           <div>
-            <label className="text-sm text-gray-300">Select Date</label>
+            <label className="text-sm text-gray-300">Select Date (YYYY-MM-DD)</label>
             <input
-              type="date"
+              type="text"
               required
+              placeholder="2026-03-30"
               value={date}
               onChange={(e) => setDate(e.target.value)}
               className="mt-2 w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-amber-400 outline-none"

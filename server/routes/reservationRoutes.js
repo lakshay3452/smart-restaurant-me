@@ -5,15 +5,20 @@ const router = express.Router();
 // Create reservation (customer side)
 router.post("/", async (req, res) => {
   try {
+    console.log("POST /api/reservations - Request body:", JSON.stringify(req.body));
     const { name, phone, guests, date, time } = req.body;
     if (!name || !phone || !guests || !date || !time) {
+      console.log("Missing fields. Name:", name, "Phone:", phone, "Guests:", guests, "Date:", date, "Time:", time);
       return res.status(400).json({ message: "All fields are required" });
     }
     const reservation = new Reservation({ name, phone, guests, date, time });
     await reservation.save();
+    console.log("Reservation created successfully:", reservation._id);
     res.json({ message: "Reservation created", reservation });
   } catch (err) {
-    res.status(500).json({ message: "Failed to create reservation" });
+    console.error("Reservation creation error:", err.message);
+    console.error("Full error:", err);
+    res.status(500).json({ message: "Failed to create reservation", error: err.message });
   }
 });
 

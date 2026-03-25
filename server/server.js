@@ -15,6 +15,12 @@ const PORT = process.env.PORT || 5000
 app.use(cors())
 app.use(express.json())
 
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
 // ================= CONNECT DATABASE =================
 
 connectDB()
@@ -68,6 +74,7 @@ app.use((err, req, res, next) => {
 // ================= SERVER START =================
 
 app.listen(PORT, () => {
+  console.log("TEST LOG: Server is starting with console logging enabled")
   console.log("\n======================================")
   console.log(`Restaurant Backend Running`)
   console.log(`Server: http://localhost:${PORT}`)

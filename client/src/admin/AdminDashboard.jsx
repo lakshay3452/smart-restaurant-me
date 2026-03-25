@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 export default function AdminDashboard() {
 
   const [orders, setOrders] = useState([]);
-  const lastCount = useRef(0);
+  const [reservations, setReservations] = useState([]);
+  const [activeTab, setActiveTab] = useState("orders");
+  const lastOrderCount = useRef(0);
+  const lastReservationCount = useRef(0);
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
@@ -17,11 +20,11 @@ export default function AdminDashboard() {
       const data = res.data.orders || res.data;
 
       // 🔔 Notification only if new order added
-      if (lastCount.current !== 0 && data.length > lastCount.current) {
+      if (lastOrderCount.current !== 0 && data.length > lastOrderCount.current) {
         alert("🔔 New Order Received!");
       }
 
-      lastCount.current = data.length;
+      lastOrderCount.current = data.length;
       setOrders(data);
 
     } catch (error) {
@@ -30,17 +33,43 @@ export default function AdminDashboard() {
 
   };
 
+  const fetchReservations = async () => {
+
+    try {
+
+      const res = await axios.get("/api/reservations");
+
+      const data = Array.isArray(res.data) ? res.data : res.data.reservations || [];
+
+      // 🔔 Notification only if new reservation added
+      if (lastReservationCount.current !== 0 && data.length > lastReservationCount.current) {
+        alert("🔔 New Table Reservation Received!");
+      }
+
+      lastReservationCount.current = data.length;
+      setReservations(data);
+
+    } catch (error) {
+      console.log("Fetch Reservations Error:", error);
+    }
+
+  };
+
   useEffect(() => {
 
     fetchOrders();
+    fetchReservations();
 
-    const interval = setInterval(fetchOrders, 3000);
+    const interval = setInterval(() => {
+      fetchOrders();
+      fetchReservations();
+    }, 3000);
 
     return () => clearInterval(interval);
 
   }, []);
 
-  const updateStatus = async (id, status) => {
+  const updateOrderStatus = async (id, status) => {
 
     try {
 
@@ -52,6 +81,54 @@ export default function AdminDashboard() {
 
     } catch (error) {
       console.log("Status Update Error:", error);
+    }
+
+  };
+
+  const updateReservationStatus = async (id, status) => {
+
+    try {
+
+      await axios.put(`/api/reservations/${id}`, {
+        status
+      });
+
+      fetchReservations();
+
+    } catch (error) {
+      console.log("Reservation Status Update Error:", error);
+    }
+
+  };
+
+  const deleteReservation = async (id) => {
+
+    if (!window.confirm("Are you sure you want to delete this reservation?")) return;
+
+    try {
+
+      await axios.delete(`/api/reservations/${id}`);
+
+      fetchReservations();
+
+    } catch (error) {
+      console.log("Delete Reservation Error:", error);
+    }
+
+  };
+
+  const deleteOrder = async (id) => {
+
+    if (!window.confirm("Are you sure you want to delete this order?")) return;
+
+    try {
+
+      await axios.delete(`/api/orders/${id}`);
+
+      fetchOrders();
+
+    } catch (error) {
+      console.log("Delete Order Error:", error);
     }
 
   };
@@ -93,70 +170,169 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {Array.isArray(orders) && orders.length === 0 && (
-        <p>No Orders Yet</p>
-      )}
+      {/* Tab Navigation */}
+      <div className="flex gap-4 mb-8 border-b border-gray-700 pb-4">
+        <button
+          onClick={() => setActiveTab("orders")}
+          className={`px-6 py-2 font-semibold rounded-lg transition ${
+            activeTab === "orders"
+              ? "bg-amber-500 text-black"
+              : "bg-gray-700 text-white hover:bg-gray-600"
+          }`}
+        >
+          📦 Orders ({orders.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("reservations")}
+          className={`px-6 py-2 font-semibold rounded-lg transition ${
+            activeTab === "reservations"
+              ? "bg-amber-500 text-black"
+              : "bg-gray-700 text-white hover:bg-gray-600"
+          }`}
+        >
+          🪑 Table Reservations ({reservations.length})
+        </button>
+      </div>
 
-      <div className="space-y-6">
+      {/* ============ ORDERS TAB ============ */}
+      {activeTab === "orders" && (
+        <>
+          {Array.isArray(orders) && orders.length === 0 && (
+            <p className="text-gray-400">No Orders Yet</p>
+          )}
 
-        {Array.isArray(orders) && orders.map(order => (
+          <div className="space-y-6">
 
-          <div
-            key={order._id || order.id}
-            className="bg-gray-900 p-6 rounded-xl border border-gray-800"
-          >
+            {Array.isArray(orders) && orders.map(order => (
 
-            <h2 className="text-xl font-semibold mb-2">
-              Order #{order._id || order.id}
-            </h2>
+              <div
+                key={order._id || order.id}
+                className="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-amber-500 transition"
+              >
 
-            <p>Name: {order.name}</p>
-            <p>Phone: {order.phone}</p>
-            <p>Address: {order.address}</p>
+                <h2 className="text-xl font-semibold mb-2">
+                  Order #{order._id || order.id}
+                </h2>
 
-            <div className="mt-4">
+                <p>Name: {order.name}</p>
+                <p>Phone: {order.phone}</p>
+                <p>Address: {order.address}</p>
 
-              <p className="font-semibold mb-1">Items:</p>
+                <div className="mt-4">
 
-              {order.items?.map((item, i) => (
-                <p key={i}>
-                  {item.name} x {item.quantity}
+                  <p className="font-semibold mb-1">Items:</p>
+
+                  {order.items?.map((item, i) => (
+                    <p key={i}>
+                      {item.name} x {item.quantity}
+                    </p>
+                  ))}
+
+                </div>
+
+                <p className="mt-4 text-amber-400 font-semibold">
+                  Total ₹{order.totalAmount || order.total}
                 </p>
-              ))}
 
-            </div>
+                <p className={`mt-2 font-semibold ${getStatusColor(order.status)}`}>
+                  Status: {order.status}
+                </p>
 
-            <p className="mt-4 text-amber-400 font-semibold">
-              Total ₹{order.totalAmount || order.total}
-            </p>
+                <div className="flex gap-3 mt-4">
 
-            <p className={`mt-2 font-semibold ${getStatusColor(order.status)}`}>
-              Status: {order.status}
-            </p>
+                  <button
+                    onClick={() => updateOrderStatus(order._id || order.id, "Accepted")}
+                    className="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                  >
+                    Accept
+                  </button>
 
-            <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => updateOrderStatus(order._id || order.id, "Rejected")}
+                    className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                  >
+                    Reject
+                  </button>
 
-              <button
-                onClick={() => updateStatus(order._id || order.id, "Accepted")}
-                className="bg-green-600 px-4 py-2 rounded-lg"
-              >
-                Accept
-              </button>
+                  <button
+                    onClick={() => deleteOrder(order._id || order.id)}
+                    className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
 
-              <button
-                onClick={() => updateStatus(order._id || order.id, "Rejected")}
-                className="bg-red-600 px-4 py-2 rounded-lg"
-              >
-                Reject
-              </button>
+                </div>
 
-            </div>
+              </div>
+
+            ))}
 
           </div>
+        </>
+      )}
 
-        ))}
+      {/* ============ RESERVATIONS TAB ============ */}
+      {activeTab === "reservations" && (
+        <>
+          {Array.isArray(reservations) && reservations.length === 0 && (
+            <p className="text-gray-400">No Table Reservations Yet</p>
+          )}
 
-      </div>
+          <div className="space-y-6">
+
+            {Array.isArray(reservations) && reservations.map(reservation => (
+
+              <div
+                key={reservation._id}
+                className="bg-gray-900 p-6 rounded-xl border border-gray-800 hover:border-amber-500 transition"
+              >
+
+                <h2 className="text-xl font-semibold mb-2">
+                  Reservation #{reservation._id}
+                </h2>
+
+                <p className="mb-1">Name: <span className="font-semibold">{reservation.name}</span></p>
+                <p className="mb-1">Phone: <span className="font-semibold">{reservation.phone}</span></p>
+                <p className="mb-1">Guests: <span className="font-semibold">{reservation.guests} people</span></p>
+                <p className="mb-1">Date: <span className="font-semibold">{reservation.date}</span></p>
+                <p className="mb-4">Time: <span className="font-semibold">{reservation.time}</span></p>
+
+                <p className={`mt-2 font-semibold ${getStatusColor(reservation.status)}`}>
+                  Status: {reservation.status}
+                </p>
+
+                <div className="flex gap-3 mt-4">
+
+                  <button
+                    onClick={() => updateReservationStatus(reservation._id, "Confirmed")}
+                    className="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                  >
+                    Confirm
+                  </button>
+
+                  <button
+                    onClick={() => updateReservationStatus(reservation._id, "Cancelled")}
+                    className="bg-yellow-600 px-4 py-2 rounded-lg hover:bg-yellow-700 transition"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={() => deleteReservation(reservation._id)}
+                    className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+        </>
+      )}
 
     </div>
 

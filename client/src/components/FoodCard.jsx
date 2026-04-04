@@ -1,63 +1,121 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
-import { Star } from "lucide-react";
+import { Star, Plus, Minus } from "lucide-react";
 
-export default function FoodCard({ item, onQuickView }) {
+export default function FoodCard({ item, index = 0, onDetailClick }) {
+  const { cartItems, addToCart, increaseQty, decreaseQty } = useCart();
+  const [imgError, setImgError] = useState(false);
 
-  const { addToCart } = useCart();
+  const itemId = item.id ?? item._id;
+  const cartItem = cartItems.find(
+    (ci) => (ci.id ?? ci._id) === itemId
+  );
+  const quantity = cartItem?.quantity || 0;
 
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="bg-white/10 backdrop-blur-xl rounded-2xl overflow-hidden shadow-lg"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.35 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -5 }}
+      className="group bg-white/[0.05] backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg hover:shadow-amber-500/10 hover:shadow-xl transition-all duration-300 cursor-pointer border border-white/[0.05] hover:border-amber-500/20"
+      onClick={() => onDetailClick?.(item)}
     >
+      {/* ── Image ── */}
+      <div className="relative h-40 sm:h-48 overflow-hidden bg-gradient-to-br from-amber-900/20 to-gray-900">
+        {!imgError ? (
+          <img
+            src={item.image}
+            alt={item.name}
+            loading="lazy"
+            onError={() => setImgError(true)}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-4xl opacity-40">
+            🍽️
+          </div>
+        )}
 
-      <div className="relative">
-        <img src={item.image} className="w-full h-56 object-cover" />
+        {/* Rating */}
+        {item.rating && (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-green-600/90 backdrop-blur-sm text-white text-[11px] font-bold px-1.5 py-0.5 rounded">
+            <Star size={10} fill="white" />
+            {item.rating}
+          </div>
+        )}
 
-        {/* Veg Badge */}
-        <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs ${
-          item.category === "Veg"
-            ? "bg-green-500"
-            : "bg-red-500"
-        }`}>
-          {item.category}
-        </span>
+        {/* Bestseller Badge */}
+        {item.bestseller && (
+          <div className="absolute top-2 left-2 bg-amber-500 text-black text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider shadow-md">
+            Bestseller
+          </div>
+        )}
+
+        {/* Veg / Non-Veg Indicator */}
+        <div
+          className={`absolute top-2 right-2 w-5 h-5 border-2 rounded-sm flex items-center justify-center bg-black/40 backdrop-blur-sm ${
+            item.isVeg ? "border-green-500" : "border-red-500"
+          }`}
+        >
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${
+              item.isVeg ? "bg-green-500" : "bg-red-500"
+            }`}
+          />
+        </div>
       </div>
 
-      <div className="p-4">
+      {/* ── Info ── */}
+      <div className="p-3 sm:p-4">
+        <h3 className="font-semibold text-white text-sm sm:text-[15px] truncate leading-tight">
+          {item.name}
+        </h3>
 
-        <h2 className="font-serif text-xl">{item.name}</h2>
+        {item.description && (
+          <p className="text-white/40 text-[11px] sm:text-xs mt-1.5 line-clamp-2 leading-relaxed">
+            {item.description}
+          </p>
+        )}
 
-        <div className="flex items-center gap-1 text-yellow-400 my-2">
-          <Star size={16} fill="currentColor" />
-          {item.rating}
+        <div className="flex items-center justify-between mt-3 gap-2">
+          <span className="text-amber-400 font-bold text-sm sm:text-base">
+            ₹{item.price}
+          </span>
+
+          {/* ADD / Qty Controls */}
+          <div onClick={(e) => e.stopPropagation()}>
+            {quantity === 0 ? (
+              <button
+                onClick={() => addToCart(item)}
+                className="bg-amber-500 hover:bg-amber-400 text-black font-bold text-[11px] sm:text-xs px-5 sm:px-5 py-2 sm:py-1.5 rounded-lg transition-all hover:scale-105 active:scale-95 shadow-md shadow-amber-500/20 uppercase tracking-wide"
+              >
+                Add
+              </button>
+            ) : (
+              <div className="flex items-center bg-amber-500 rounded-lg overflow-hidden shadow-md shadow-amber-500/20">
+                <button
+                  onClick={() => decreaseQty(item.id || item._id)}
+                  className="px-2.5 py-2 sm:py-1.5 hover:bg-amber-400 transition text-black"
+                >
+                  <Minus size={13} strokeWidth={3} />
+                </button>
+                <span className="text-black font-bold text-xs min-w-[20px] text-center">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => increaseQty(item.id || item._id)}
+                  className="px-2.5 py-2 sm:py-1.5 hover:bg-amber-400 transition text-black"
+                >
+                  <Plus size={13} strokeWidth={3} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-
-        <p className="font-semibold text-amberAccent">
-          ₹{item.price}
-        </p>
-
-        <div className="flex gap-3 mt-4">
-
-          <button
-            onClick={() => addToCart(item)}
-            className="flex-1 bg-emeraldAccent py-2 rounded-xl"
-          >
-            Add
-          </button>
-
-          <button
-            onClick={onQuickView}
-            className="flex-1 bg-white/10 py-2 rounded-xl"
-          >
-            View
-          </button>
-
-        </div>
-
       </div>
-
     </motion.div>
   );
 }

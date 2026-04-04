@@ -25,22 +25,58 @@ function generateOTP() {
 // Send OTP email
 async function sendOTPEmail(email, otp, purpose) {
   const subject = purpose === "register"
-    ? "Smart Restaurant - Verify Your Email"
-    : "Smart Restaurant - Login OTP";
+    ? "LaCasa — Verify Your Email"
+    : "LaCasa — Login OTP";
+
+  const purposeText = purpose === "register" ? "complete your registration" : "log in to your account";
 
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:30px;background:#1a1a1a;border-radius:16px;color:#fff;">
-      <h2 style="color:#f59e0b;text-align:center;">Smart Restaurant</h2>
-      <p style="text-align:center;font-size:16px;">Your OTP for ${purpose === "register" ? "registration" : "login"} is:</p>
-      <div style="text-align:center;margin:24px 0;">
-        <span style="font-size:36px;font-weight:bold;letter-spacing:8px;color:#f59e0b;background:#333;padding:12px 24px;border-radius:12px;">${otp}</span>
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:500px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#1a1a1a,#111);padding:28px;text-align:center;">
+        <h1 style="color:#f59e0b;font-size:30px;margin:0;font-family:Georgia,'Times New Roman',serif;letter-spacing:1px;">LaCasa</h1>
+        <p style="color:#888;font-size:11px;margin:6px 0 0;letter-spacing:2px;text-transform:uppercase;">Fine Dining Experience</p>
       </div>
-      <p style="text-align:center;color:#999;font-size:13px;">This OTP expires in 5 minutes. Do not share it with anyone.</p>
+
+      <!-- Body -->
+      <div style="padding:32px 30px;">
+        <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 8px;text-align:center;font-weight:600;">Your Verification Code</h2>
+        <p style="color:#666;font-size:14px;text-align:center;margin:0 0 28px;line-height:1.5;">
+          Use the code below to ${purposeText}
+        </p>
+
+        <!-- OTP Box -->
+        <div style="text-align:center;margin:0 0 28px;">
+          <div style="display:inline-block;background:#fffbeb;border:2px solid #f59e0b;border-radius:14px;padding:16px 36px;">
+            <span style="font-size:38px;font-weight:800;letter-spacing:10px;color:#1a1a1a;font-family:'Courier New',monospace;">${otp}</span>
+          </div>
+        </div>
+
+        <!-- Timer Info -->
+        <div style="text-align:center;margin-bottom:24px;">
+          <span style="display:inline-block;background:#f3f4f6;border-radius:20px;padding:6px 16px;font-size:12px;color:#888;">
+            ⏱ Expires in 5 minutes
+          </span>
+        </div>
+
+        <!-- Warning -->
+        <div style="background:#fef3c7;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:24px;">
+          <p style="color:#92400e;font-size:12px;margin:0;line-height:1.6;">
+            <strong>Security Tip:</strong> Never share this code with anyone. LaCasa staff will never ask for your OTP.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="background:#f9fafb;padding:18px 30px;text-align:center;border-top:1px solid #eee;">
+        <p style="color:#999;font-size:11px;margin:0;">© ${new Date().getFullYear()} LaCasa Restaurant. All rights reserved.</p>
+      </div>
     </div>
   `;
 
   await transporter.sendMail({
-    from: `"Smart Restaurant" <${process.env.EMAIL_USER}>`,
+    from: `"LaCasa Restaurant" <${process.env.EMAIL_USER}>`,
     to: email,
     subject,
     html
@@ -49,22 +85,69 @@ async function sendOTPEmail(email, otp, purpose) {
 
 // Send login success email
 async function sendLoginSuccessEmail(email, userName) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+  const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:30px;background:#1a1a1a;border-radius:16px;color:#fff;">
-      <h2 style="color:#f59e0b;text-align:center;">Smart Restaurant</h2>
-      <p style="text-align:center;font-size:18px;margin:20px 0;">Welcome Back, <strong>${userName}!</strong></p>
-      <div style="background:#333;padding:20px;border-radius:12px;text-align:center;margin:20px 0;">
-        <p style="font-size:16px;margin:0;">You have successfully logged in to your account.</p>
+    <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:500px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+      
+      <!-- Header -->
+      <div style="background:linear-gradient(135deg,#1a1a1a,#111);padding:28px;text-align:center;">
+        <h1 style="color:#f59e0b;font-size:30px;margin:0;font-family:Georgia,'Times New Roman',serif;letter-spacing:1px;">LaCasa</h1>
+        <p style="color:#888;font-size:11px;margin:6px 0 0;letter-spacing:2px;text-transform:uppercase;">Fine Dining Experience</p>
       </div>
-      <p style="text-align:center;color:#999;font-size:13px;margin-top:20px;">If this wasn't you, please change your password immediately.</p>
-      <p style="text-align:center;color:#f59e0b;font-size:12px;">Thank you for choosing Smart Restaurant!</p>
+
+      <!-- Body -->
+      <div style="padding:32px 30px;">
+        <!-- Success Icon -->
+        <div style="text-align:center;margin-bottom:20px;">
+          <div style="display:inline-block;background:#ecfdf5;border-radius:50%;width:56px;height:56px;line-height:56px;font-size:28px;">✓</div>
+        </div>
+
+        <h2 style="color:#1a1a1a;font-size:20px;margin:0 0 6px;text-align:center;font-weight:600;">Welcome Back!</h2>
+        <p style="color:#666;font-size:14px;text-align:center;margin:0 0 24px;">
+          Hi <strong style="color:#1a1a1a;">${userName}</strong>, you've successfully logged in.
+        </p>
+
+        <!-- Login Details -->
+        <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+          <table style="width:100%;font-size:13px;">
+            <tr>
+              <td style="color:#888;padding:4px 0;">📅 Date</td>
+              <td style="color:#333;text-align:right;padding:4px 0;font-weight:500;">${dateStr}</td>
+            </tr>
+            <tr>
+              <td style="color:#888;padding:4px 0;">🕐 Time</td>
+              <td style="color:#333;text-align:right;padding:4px 0;font-weight:500;">${timeStr}</td>
+            </tr>
+            <tr>
+              <td style="color:#888;padding:4px 0;">📧 Email</td>
+              <td style="color:#333;text-align:right;padding:4px 0;font-weight:500;">${email}</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Warning -->
+        <div style="background:#fef2f2;border-left:4px solid #ef4444;border-radius:0 8px 8px 0;padding:12px 16px;">
+          <p style="color:#991b1b;font-size:12px;margin:0;line-height:1.6;">
+            <strong>Not you?</strong> If you didn't log in, please change your password immediately or contact our support.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="background:#f9fafb;padding:18px 30px;text-align:center;border-top:1px solid #eee;">
+        <p style="color:#f59e0b;font-size:12px;margin:0 0 4px;font-weight:600;">Thank you for choosing LaCasa! 🍽️</p>
+        <p style="color:#999;font-size:11px;margin:0;">© ${new Date().getFullYear()} LaCasa Restaurant. All rights reserved.</p>
+      </div>
     </div>
   `;
 
   await transporter.sendMail({
-    from: `"Smart Restaurant" <${process.env.EMAIL_USER}>`,
+    from: `"LaCasa Restaurant" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: "Smart Restaurant - Login Successful",
+    subject: "LaCasa — Login Successful ✓",
     html
   });
 }

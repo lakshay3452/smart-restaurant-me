@@ -31,7 +31,7 @@ export default function ReferralDashboard() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareText = `Join me on Smart Restaurant using my referral code: ${referralData?.referralCode}. Get ₹100 bonus!`;
+  const shareText = `Join me on LaCasa using my referral code: ${referralData?.referralCode}. Get ₹100 bonus!`;
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (!referralData) return <div className="text-center py-8">Referral data not found</div>;
@@ -82,7 +82,7 @@ export default function ReferralDashboard() {
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
-                  title: "Smart Restaurant Referral",
+                  title: "LaCasa Referral",
                   text: shareText,
                 });
               }

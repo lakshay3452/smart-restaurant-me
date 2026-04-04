@@ -47,8 +47,8 @@ export default function Navbar() {
   }, [location.pathname]);
 
   return (
-    <nav ref={navRef} className="fixed top-0 w-full z-50 bg-black border-b border-white/10">
-      <div className="w-full px-4 py-4 flex justify-between items-center">
+    <nav ref={navRef} className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/[0.06]">
+      <div className="w-full px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
 
         {/* LEFT SECTION */}
         <div className="flex items-center gap-4">
@@ -208,15 +208,6 @@ export default function Navbar() {
                 >
                   <User size={18} />
                   {user?.name || "Profile"}
-                </button>
-                <button
-                  onClick={() => {
-                    navigate("/orders");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="hover:text-amber-400 text-left"
-                >
-                  My Orders
                 </button>
                 <button
                   onClick={handleLogout}

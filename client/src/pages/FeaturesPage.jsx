@@ -12,7 +12,7 @@ export default function FeaturesPage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
-            Smart Restaurant Features
+            LaCasa Features
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Loyalty rewards, wallet payments, referral bonuses, and more

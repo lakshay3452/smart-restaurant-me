@@ -114,7 +114,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-gradient-to-br from-black via-gray-900 to-black">
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+      <div className="w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl p-5 sm:p-8 shadow-2xl">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -170,7 +170,7 @@ export default function Register() {
                 OTP sent to <span className="text-amber-400">{email}</span>
               </p>
 
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-1.5 sm:gap-2">
                 {otpDigits.map((digit, index) => (
                   <input
                     key={index}
@@ -180,7 +180,7 @@ export default function Register() {
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                    className="w-12 h-12 text-center text-2xl font-bold bg-white/10 border-2 border-amber-500/50 rounded-lg text-white focus:border-amber-400 focus:outline-none"
+                    className="w-10 h-10 sm:w-12 sm:h-12 text-center text-xl sm:text-2xl font-bold bg-white/10 border-2 border-amber-500/50 rounded-lg text-white focus:border-amber-400 focus:outline-none"
                   />
                 ))}
               </div>

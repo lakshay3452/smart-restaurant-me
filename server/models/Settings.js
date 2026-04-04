@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const settingsSchema = new mongoose.Schema({
-  restaurantName: { type: String, default: "Smart Restaurant" },
+  restaurantName: { type: String, default: "LaCasa" },
   address: { type: String, default: "" },
   phone: { type: String, default: "" },
   email: { type: String, default: "" },

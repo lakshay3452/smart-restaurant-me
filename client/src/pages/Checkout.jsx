@@ -3,6 +3,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 import toast from "react-hot-toast"
+import { motion } from "framer-motion"
+import { ShoppingBag, MapPin } from "lucide-react"
 
 export default function Checkout() {
 
@@ -29,6 +31,9 @@ export default function Checkout() {
       setPhone(value)
     }
   }
+
+  const taxes = Math.round(totalPrice * 0.05)
+  const grandTotal = totalPrice + taxes
 
   const handleOrder = async(e)=>{
 
@@ -76,132 +81,168 @@ export default function Checkout() {
 
   }
 
+  const itemCount = cartItems.reduce((a, b) => a + b.quantity, 0)
+
   return(
 
-    <div className="min-h-screen bg-white text-black p-6">
+    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-10">
+      <div className="max-w-5xl mx-auto">
 
-      <h1 className="text-3xl font-serif mb-8">
-        Checkout
-      </h1>
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-2xl sm:text-3xl font-serif text-white mb-1">
+            <span className="text-amber-400">Checkout</span>
+          </h1>
+          <p className="text-white/40 text-xs sm:text-sm mb-6 sm:mb-8">
+            Review your order and fill in delivery details
+          </p>
+        </motion.div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+        <div className="flex flex-col-reverse lg:flex-row gap-6">
 
-        {/* ORDER SUMMARY */}
-
-        <div className="bg-gray-100 p-6 rounded-xl">
-
-          <h2 className="text-xl font-semibold mb-4">
-            Your Order
-          </h2>
-
-          {cartItems.map(item=>(
-
-            <div
-              key={item._id || item.id}
-              className="flex items-center justify-between border-b py-3"
-            >
-
-              <div className="flex items-center gap-3">
-
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-14 h-14 rounded-lg object-cover"
-                />
-
-                <div>
-
-                  <p className="font-medium">
-                    {item.name}
-                  </p>
-
-                  <p className="text-gray-500 text-sm">
-                    Qty: {item.quantity}
-                  </p>
-
-                </div>
-
-              </div>
-
-              <p className="font-semibold">
-                ₹{item.price * item.quantity}
-              </p>
-
+          {/* LEFT — ADDRESS FORM */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            onSubmit={handleOrder}
+            className="flex-1 bg-white/[0.04] border border-white/[0.06] p-5 sm:p-6 rounded-2xl space-y-4 sm:space-y-5"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin size={18} className="text-amber-400" />
+              <h2 className="text-white font-semibold text-base sm:text-lg">
+                Delivery Details
+              </h2>
             </div>
 
-          ))}
+            <div>
+              <label className="text-white/40 text-xs sm:text-sm mb-1.5 block">Full Name</label>
+              <input
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={handleNameChange}
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 text-sm transition"
+                required
+              />
+            </div>
 
-          <div className="mt-6 flex justify-between text-lg font-semibold">
+            <div>
+              <label className="text-white/40 text-xs sm:text-sm mb-1.5 block">Email Address</label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 text-sm transition"
+                required
+              />
+            </div>
 
-            <span>Total</span>
+            <div>
+              <label className="text-white/40 text-xs sm:text-sm mb-1.5 block">Phone Number</label>
+              <input
+                type="text"
+                placeholder="10-digit phone number"
+                value={phone}
+                onChange={handlePhoneChange}
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 text-sm transition"
+                maxLength="10"
+                required
+              />
+            </div>
 
-            <span className="text-amber-500">
-              ₹{totalPrice}
-            </span>
+            <div>
+              <label className="text-white/40 text-xs sm:text-sm mb-1.5 block">Delivery Address</label>
+              <textarea
+                placeholder="Full address with landmark"
+                value={address}
+                onChange={(e)=>setAddress(e.target.value)}
+                rows={3}
+                className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 text-sm transition resize-none"
+                required
+              />
+            </div>
 
-          </div>
+            <button
+              type="submit"
+              className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 sm:py-3.5 rounded-xl transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-amber-500/20 text-sm sm:text-base mt-2"
+            >
+              Place Order — ₹{grandTotal}
+            </button>
+          </motion.form>
+
+
+          {/* RIGHT — ORDER SUMMARY */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:w-[360px] shrink-0"
+          >
+            <div className="bg-white/[0.04] border border-white/[0.06] p-5 sm:p-6 rounded-2xl sticky top-24">
+              <div className="flex items-center gap-2 mb-4">
+                <ShoppingBag size={18} className="text-amber-400" />
+                <h2 className="text-white font-semibold text-base sm:text-lg">
+                  Your Order
+                </h2>
+                <span className="text-white/30 text-xs">({itemCount})</span>
+              </div>
+
+              <div className="space-y-3 max-h-60 sm:max-h-72 overflow-y-auto pr-1 menu-scrollbar-hide">
+                {cartItems.map(item=>(
+                  <div
+                    key={item._id || item.id}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-amber-900/20 to-gray-800 shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => (e.target.style.display = "none")}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm truncate">{item.name}</p>
+                      <p className="text-white/30 text-xs">Qty: {item.quantity}</p>
+                      {item.extras && item.extras.length > 0 && (
+                        <p className="text-amber-400/50 text-[10px] truncate">+ {item.extras.join(", ")}</p>
+                      )}
+                      {item.spiceLevel && (
+                        <p className="text-white/20 text-[10px]">🌶️ {item.spiceLevel}</p>
+                      )}
+                    </div>
+                    <p className="text-amber-400 font-semibold text-sm shrink-0">
+                      ₹{item.price * item.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bill Breakdown */}
+              <div className="border-t border-white/[0.06] mt-4 pt-4 space-y-2.5 text-sm">
+                <div className="flex justify-between text-white/40">
+                  <span>Subtotal</span>
+                  <span>₹{totalPrice}</span>
+                </div>
+                <div className="flex justify-between text-white/40">
+                  <span>Delivery Fee</span>
+                  <span className="text-green-400">FREE</span>
+                </div>
+                <div className="flex justify-between text-white/40">
+                  <span>Taxes (5%)</span>
+                  <span>₹{taxes}</span>
+                </div>
+                <div className="border-t border-white/[0.06] pt-2.5 flex justify-between text-white font-bold text-base">
+                  <span>Total</span>
+                  <span className="text-amber-400">₹{grandTotal}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
         </div>
-
-
-        {/* ADDRESS FORM */}
-
-        <form
-          onSubmit={handleOrder}
-          className="bg-gray-100 p-6 rounded-xl space-y-4"
-        >
-
-          <h2 className="text-xl font-semibold">
-            Delivery Details
-          </h2>
-
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={handleNameChange}
-            className="w-full p-3 border rounded-lg"
-            required
-          />
-
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e)=>setEmail(e.target.value)}
-            className="w-full p-3 border rounded-lg"
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={handlePhoneChange}
-            className="w-full p-3 border rounded-lg"
-            maxLength="10"
-            required
-          />
-
-          <textarea
-            placeholder="Full Address"
-            value={address}
-            onChange={(e)=>setAddress(e.target.value)}
-            className="w-full p-3 border rounded-lg"
-            required
-          />
-
-          <button
-            type="submit"
-            className="w-full bg-amber-500 text-white py-3 rounded-xl"
-          >
-            Place Order
-          </button>
-
-        </form>
-
       </div>
-
     </div>
 
   )

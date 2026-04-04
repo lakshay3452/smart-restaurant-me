@@ -1,40 +1,41 @@
-.menu-container {
-  padding: 40px;
-  text-align: center;
+/* ═══════════ Swiggy-inspired Menu Styles ═══════════ */
+
+/* Hide scrollbar on category bar & modal */
+.menu-scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.menu-scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.menu-title {
-  font-size: 32px;
-  margin-bottom: 30px;
+/* Skeleton shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-.menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
-.menu-card {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+/* Smooth scroll offset for sticky header */
+section[data-category] {
+  scroll-margin-top: 160px;
 }
 
-.menu-card h3 {
-  margin-bottom: 10px;
+/* Card image lazy load fade-in */
+.food-card-img {
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
-
-.menu-card button {
-  margin-top: 10px;
-  background: red;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.menu-card button:hover {
-  background: darkred;
+.food-card-img.loaded {
+  opacity: 1;
 }

@@ -89,7 +89,7 @@ export default function Checkout() {
 
     try{
 
-      await axios.post("/api/orders",{
+      const response = await axios.post("/api/orders",{
         name,
         email,
         phone,
@@ -98,10 +98,12 @@ export default function Checkout() {
         total: totalPrice
       })
 
+      const orderId = response.data.order._id || response.data.order.id
+
       // Save to localStorage for order history
       const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]")
       savedOrders.push({
-        id: "ORD" + Date.now(),
+        id: orderId,
         date: new Date().toLocaleDateString(),
         items: cartItems,
         total: totalPrice,

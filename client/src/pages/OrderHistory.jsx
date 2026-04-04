@@ -1,16 +1,60 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "axios";
 import { Package, ArrowRight } from "lucide-react";
+
+const STATUS_COLORS = {
+  Pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+  Confirmed: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+  Preparing: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  "Out for Delivery": "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  Delivered: "bg-green-500/10 text-green-400 border-green-500/20",
+  Rejected: "bg-red-500/10 text-red-400 border-red-500/20",
+};
 
 export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  const fetchOrders = async () => {
+    try {
+      // Try fetching from DB using email
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+      if (user?.email) {
+        const res = await axios.get(`/api/orders/my-orders/${encodeURIComponent(user.email)}`);
+        if (res.data && res.data.length > 0) {
+          setOrders(res.data);
+          setLoading(false);
+          return;
+        }
+      }
+      // Fallback to localStorage
+      const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      // Try to fetch live status for each saved order
+      const updated = await Promise.all(
+        savedOrders.map(async (order) => {
+          try {
+            const res = await axios.get(`/api/orders/track/${order.id}`);
+            return { ...order, status: res.data.status, totalAmount: res.data.totalAmount };
+          } catch {
+            return order;
+          }
+        })
+      );
+      setOrders(updated);
+    } catch {
+      const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
+      setOrders(savedOrders);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const savedOrders =
-      JSON.parse(localStorage.getItem("orders")) || [];
-    setOrders(savedOrders);
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 10000); // refresh every 10s
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -57,7 +101,7 @@ export default function OrderHistory() {
                     </h2>
                   </div>
 
-                  <span className="self-start sm:self-auto text-xs px-3 py-1 rounded-full font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span className={`self-start sm:self-auto text-xs px-3 py-1 rounded-full font-medium border ${STATUS_COLORS[order.status] || STATUS_COLORS["Pending"]}`}>
                     {order.status}
                   </span>
                 </div>
@@ -87,7 +131,7 @@ export default function OrderHistory() {
                   </div>
 
                   <button
-                    onClick={() => navigate("/tracking")}
+                    onClick={() => navigate(`/tracking?orderId=${order._id || order.id}`)}
                     className="flex items-center gap-1.5 text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition"
                   >
                     Track

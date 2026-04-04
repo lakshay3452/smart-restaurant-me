@@ -134,12 +134,21 @@ export default function AdminDashboard() {
   };
 
   const getStatusColor = (status) => {
-
     if (status === "Pending") return "text-yellow-400";
-    if (status === "Accepted") return "text-green-400";
+    if (status === "Confirmed") return "text-blue-400";
+    if (status === "Preparing") return "text-orange-400";
+    if (status === "Out for Delivery") return "text-purple-400";
+    if (status === "Delivered") return "text-green-400";
     if (status === "Rejected") return "text-red-400";
-
     return "text-white";
+  };
+
+  const ORDER_FLOW = ["Pending", "Confirmed", "Preparing", "Out for Delivery", "Delivered"];
+
+  const getNextStatus = (current) => {
+    const idx = ORDER_FLOW.indexOf(current);
+    if (idx >= 0 && idx < ORDER_FLOW.length - 1) return ORDER_FLOW[idx + 1];
+    return null;
   };
 
   return (
@@ -238,25 +247,43 @@ export default function AdminDashboard() {
                   Status: {order.status}
                 </p>
 
-                <div className="flex gap-3 mt-4">
+                <div className="flex flex-wrap gap-2 mt-4">
 
-                  <button
-                    onClick={() => updateOrderStatus(order._id || order.id, "Accepted")}
-                    className="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition"
-                  >
-                    Accept
-                  </button>
+                  {/* Next Status Button */}
+                  {getNextStatus(order.status) && (
+                    <button
+                      onClick={() => updateOrderStatus(order._id || order.id, getNextStatus(order.status))}
+                      className="bg-amber-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-amber-400 transition"
+                    >
+                      → {getNextStatus(order.status)}
+                    </button>
+                  )}
 
-                  <button
-                    onClick={() => updateOrderStatus(order._id || order.id, "Rejected")}
-                    className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                  {/* All Status Dropdown */}
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateOrderStatus(order._id || order.id, e.target.value)}
+                    className="bg-gray-800 text-white px-3 py-2 rounded-lg border border-gray-700 cursor-pointer"
                   >
-                    Reject
-                  </button>
+                    {ORDER_FLOW.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                    <option value="Rejected">Rejected</option>
+                  </select>
+
+                  {/* Reject (only if not already rejected/delivered) */}
+                  {order.status !== "Rejected" && order.status !== "Delivered" && (
+                    <button
+                      onClick={() => updateOrderStatus(order._id || order.id, "Rejected")}
+                      className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                    >
+                      Reject
+                    </button>
+                  )}
 
                   <button
                     onClick={() => deleteOrder(order._id || order.id)}
-                    className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                    className="bg-red-900 px-4 py-2 rounded-lg hover:bg-red-800 transition text-red-300"
                   >
                     Delete
                   </button>

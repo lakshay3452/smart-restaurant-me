@@ -141,6 +141,7 @@ router.post("/", async (req, res) => {
 
     const order = new Order({
       name,
+      email,
       phone,
       address,
       items,
@@ -176,6 +177,29 @@ router.get("/json", async (req, res) => {
       totalOrders: orders.length,
       orders
     })
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch orders" })
+  }
+})
+
+// GET single order by ID (for tracking)
+router.get("/track/:id", async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" })
+    }
+    res.json(order)
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch order" })
+  }
+})
+
+// GET orders by email (for order history)
+router.get("/my-orders/:email", async (req, res) => {
+  try {
+    const orders = await Order.find({ email: req.params.email }).sort({ createdAt: -1 })
+    res.json(orders)
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch orders" })
   }

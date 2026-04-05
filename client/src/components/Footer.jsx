@@ -12,9 +12,16 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 lg:col-span-2">
-            <h2 className="text-2xl sm:text-3xl font-serif text-amber-400 mb-3">
-              LaCasa
-            </h2>
+            <div className="flex items-center gap-2 mb-3">
+              <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" stroke="#f59e0b" strokeWidth="3" fill="#0f0f0f"/>
+                <text x="50" y="62" textAnchor="middle" fill="#f59e0b" fontFamily="serif" fontWeight="bold" fontSize="42">L</text>
+                <path d="M20 78 Q50 90 80 78" stroke="#f59e0b" strokeWidth="2" fill="none"/>
+              </svg>
+              <h2 className="text-2xl sm:text-3xl font-serif text-amber-400">
+                LaCasa
+              </h2>
+            </div>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs">
               Experience fine dining crafted with passion and perfection. From farm-fresh ingredients to your table.
             </p>

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, LogIn, LogOut } from "lucide-react";
+import { ShoppingCart, User, Menu, X, LogIn, LogOut, Heart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useEffect, useRef, useState } from "react";
 
@@ -61,12 +61,19 @@ export default function Navbar() {
           />
 
           {/* Brand */}
-          <h1
+          <div
             onClick={goHome}
-            className="text-2xl font-serif text-amber-400 cursor-pointer select-none"
+            className="flex items-center gap-2 cursor-pointer select-none"
           >
-            LaCasa
-          </h1>
+            <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="48" stroke="#f59e0b" strokeWidth="3" fill="#0f0f0f"/>
+              <text x="50" y="62" textAnchor="middle" fill="#f59e0b" fontFamily="serif" fontWeight="bold" fontSize="42">L</text>
+              <path d="M20 78 Q50 90 80 78" stroke="#f59e0b" strokeWidth="2" fill="none"/>
+            </svg>
+            <h1 className="text-2xl font-serif text-amber-400">
+              LaCasa
+            </h1>
+          </div>
 
         </div>
 
@@ -101,6 +108,12 @@ export default function Navbar() {
             <ShoppingCart size={18} />
             Cart {cartCount > 0 && `(${cartCount})`}
           </button>
+
+          {isLoggedIn && (
+            <button onClick={() => navigate("/favourites")} className="hover:text-amber-400 flex items-center gap-1">
+              <Heart size={18} />
+            </button>
+          )}
 
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
@@ -196,6 +209,16 @@ export default function Navbar() {
               <ShoppingCart size={18} />
               Cart {cartCount > 0 && `(${cartCount})`}
             </button>
+
+            {isLoggedIn && (
+              <button
+                onClick={() => { navigate("/favourites"); setMobileMenuOpen(false); }}
+                className="hover:text-amber-400 flex items-center gap-2 text-left"
+              >
+                <Heart size={18} />
+                Favourites
+              </button>
+            )}
 
             {isLoggedIn ? (
               <>

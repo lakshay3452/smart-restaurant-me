@@ -10,6 +10,8 @@ export default function AdminDashboard() {
   const lastOrderCount = useRef(0);
   const lastReservationCount = useRef(0);
   const navigate = useNavigate();
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
+  const [savedCharge, setSavedCharge] = useState(0);
 
   const fetchOrders = async () => {
 
@@ -59,6 +61,7 @@ export default function AdminDashboard() {
 
     fetchOrders();
     fetchReservations();
+    fetchDeliveryCharge();
 
     const interval = setInterval(() => {
       fetchOrders();
@@ -68,6 +71,24 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
 
   }, []);
+
+  const fetchDeliveryCharge = async () => {
+    try {
+      const res = await axios.get("/api/settings");
+      setDeliveryCharge(res.data.deliveryCharge ?? 0);
+      setSavedCharge(res.data.deliveryCharge ?? 0);
+    } catch {}
+  };
+
+  const saveDeliveryCharge = async () => {
+    try {
+      await axios.put("/api/settings", { deliveryCharge: Number(deliveryCharge) });
+      setSavedCharge(Number(deliveryCharge));
+      alert("Delivery charge updated!");
+    } catch {
+      alert("Failed to update");
+    }
+  };
 
   const updateOrderStatus = async (id, status) => {
 
@@ -177,6 +198,50 @@ export default function AdminDashboard() {
             Logout
           </button>
         </div>
+      </div>
+
+      {/* Quick Access Buttons */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <button onClick={() => navigate("/admin-analytics")} className="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg text-sm font-semibold transition">
+          📊 Analytics
+        </button>
+        <button onClick={() => navigate("/admin-coupons")} className="bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg text-sm font-semibold transition">
+          🎟️ Coupons
+        </button>
+        <button onClick={() => navigate("/admin-flash-deals")} className="bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg text-sm font-semibold transition">
+          ⚡ Flash Deals
+        </button>
+        <button onClick={() => navigate("/admin-chat")} className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg text-sm font-semibold transition">
+          💬 Customer Chats
+        </button>
+        <button onClick={() => navigate("/admin-tables")} className="bg-cyan-600 hover:bg-cyan-500 px-4 py-2 rounded-lg text-sm font-semibold transition">
+          📱 QR Tables
+        </button>
+      </div>
+
+      {/* Delivery Charge Setting */}
+      <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
+        <span className="text-white/70 text-sm font-medium">🚚 Delivery Charge:</span>
+        <div className="flex items-center gap-2">
+          <span className="text-white/50">₹</span>
+          <input
+            type="number"
+            min="0"
+            value={deliveryCharge}
+            onChange={(e) => setDeliveryCharge(e.target.value)}
+            className="bg-black border border-gray-700 rounded-lg px-3 py-2 w-24 text-white text-sm focus:border-amber-500 outline-none"
+          />
+        </div>
+        <button
+          onClick={saveDeliveryCharge}
+          disabled={Number(deliveryCharge) === savedCharge}
+          className="bg-amber-500 text-black px-4 py-2 rounded-lg text-sm font-semibold disabled:opacity-40 hover:bg-amber-400 transition"
+        >
+          Save
+        </button>
+        <span className="text-white/30 text-xs">
+          {savedCharge === 0 ? "Currently: FREE" : `Currently: ₹${savedCharge}`}
+        </span>
       </div>
 
       {/* Tab Navigation */}

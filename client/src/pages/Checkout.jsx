@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
@@ -6,8 +6,8 @@ import toast from "react-hot-toast"
 import { motion, AnimatePresence } from "framer-motion"
 import { ShoppingBag, MapPin, Tag, X, Share2 } from "lucide-react"
 
-/* ── Available Coupons ── */
-const COUPONS = [
+/* ── Fallback coupons if API fails ── */
+const FALLBACK_COUPONS = [
   { code: "WELCOME20", discount: 20, type: "percent", minOrder: 200, maxDiscount: 100, description: "20% off on first order (max ₹100)" },
   { code: "LACASA50", discount: 50, type: "flat", minOrder: 300, maxDiscount: 50, description: "Flat ₹50 off on orders above ₹300" },
   { code: "FEAST100", discount: 100, type: "flat", minOrder: 500, maxDiscount: 100, description: "Flat ₹100 off on orders above ₹500" },
@@ -18,6 +18,17 @@ export default function Checkout() {
 
   const { cartItems, totalPrice, clearCart } = useCart()
   const navigate = useNavigate()
+  const [COUPONS, setCOUPONS] = useState(FALLBACK_COUPONS);
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
+
+  useEffect(() => {
+    axios.get("/api/coupons/active")
+      .then(res => { if (res.data && res.data.length > 0) setCOUPONS(res.data); })
+      .catch(() => {});
+    axios.get("/api/settings")
+      .then(res => { setDeliveryCharge(res.data.deliveryCharge ?? 0); })
+      .catch(() => {});
+  }, []);
 
   const [name,setName] = useState("")
   const [email,setEmail] = useState("")
@@ -68,12 +79,12 @@ export default function Checkout() {
       : appliedCoupon.discount
     : 0
 
-  const grandTotal = totalPrice + taxes - couponDiscount
+  const grandTotal = totalPrice + taxes + deliveryCharge - couponDiscount
 
   // ── WhatsApp share ──
   const shareOnWhatsApp = () => {
     const itemLines = cartItems.map((i) => `• ${i.name} x${i.quantity} — ₹${i.price * i.quantity}`).join("\n")
-    const msg = `🍽️ *LaCasa Order Summary*\n\n${itemLines}\n\n💰 Subtotal: ₹${totalPrice}\n📦 Delivery: FREE\n🏷️ Tax: ₹${taxes}${couponDiscount > 0 ? `\n🎟️ Discount: -₹${couponDiscount}` : ""}\n✅ *Total: ₹${grandTotal}*\n\nOrder at LaCasa! 🔥`
+    const msg = `🍽️ *LaCasa Order Summary*\n\n${itemLines}\n\n💰 Subtotal: ₹${totalPrice}\n📦 Delivery: ${deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}\n🏷️ Tax: ₹${taxes}${couponDiscount > 0 ? `\n🎟️ Discount: -₹${couponDiscount}` : ""}\n✅ *Total: ₹${grandTotal}*\n\nOrder at LaCasa! 🔥`
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
@@ -352,7 +363,9 @@ export default function Checkout() {
                 </div>
                 <div className="flex justify-between text-white/40">
                   <span>Delivery Fee</span>
-                  <span className="text-green-400">FREE</span>
+                  <span className={deliveryCharge === 0 ? "text-green-400" : "text-white"}>
+                    {deliveryCharge === 0 ? "FREE" : `₹${deliveryCharge}`}
+                  </span>
                 </div>
                 <div className="flex justify-between text-white/40">
                   <span>Taxes (5%)</span>

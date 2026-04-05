@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CheckCircle, ChefHat, Truck, Package, Clock, XCircle } from "lucide-react";
@@ -16,6 +16,23 @@ function getStepIndex(status) {
   return idx >= 0 ? idx : -1;
 }
 
+function sendStatusNotification(status, orderId) {
+  if (Notification.permission !== "granted") return;
+  const messages = {
+    Confirmed: "Your order has been confirmed! 🎉",
+    Preparing: "Chef is now preparing your food 👨‍🍳",
+    "Out for Delivery": "Your order is on the way! 🚀",
+    Delivered: "Your order has been delivered. Enjoy! 🍽️",
+    Rejected: "Sorry, your order was rejected ❌",
+  };
+  const body = messages[status] || `Order status: ${status}`;
+  new Notification("LaCasa Order Update", {
+    body,
+    icon: "/icons/icon-192x192.png",
+    tag: `order-${orderId}`,
+  });
+}
+
 export default function TrackOrder() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -24,12 +41,28 @@ export default function TrackOrder() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const prevStatusRef = useRef(null);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const fetchOrder = async () => {
     if (!orderId) { setLoading(false); setError(true); return; }
     try {
       const res = await axios.get(`/api/orders/track/${orderId}`);
-      setOrder(res.data);
+      const newOrder = res.data;
+
+      // Send browser notification on status change
+      if (prevStatusRef.current && prevStatusRef.current !== newOrder.status) {
+        sendStatusNotification(newOrder.status, orderId);
+      }
+      prevStatusRef.current = newOrder.status;
+
+      setOrder(newOrder);
       setError(false);
     } catch {
       setError(true);

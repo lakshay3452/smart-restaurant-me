@@ -1,15 +1,41 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useCart } from "../context/CartContext";
-import { Star, Plus, Minus } from "lucide-react";
+import { Star, Plus, Minus, Heart } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
-export default function FoodCard({ item, index = 0, onDetailClick }) {
+export default function FoodCard({ item, index = 0, onDetailClick, favourites = [], onFavToggle }) {
   const { cartItems, addToCart, increaseQty, decreaseQty } = useCart();
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [addBounce, setAddBounce] = useState(false);
 
+  const user = JSON.parse(localStorage.getItem("user") || "null");
   const itemId = item.id ?? item._id;
+  const isFav = favourites.some(f => f.menuItemId === String(itemId));
+
+  const toggleFav = async (e) => {
+    e.stopPropagation();
+    if (!user?.email) { toast.error("Login to add favourites"); return; }
+    try {
+      if (isFav) {
+        await axios.delete(`/api/favourites/${encodeURIComponent(user.email)}/${itemId}`);
+        toast.success("Removed from favourites");
+      } else {
+        await axios.post("/api/favourites", {
+          email: user.email, menuItemId: String(itemId),
+          name: item.name, price: item.price, image: item.image,
+          category: item.category, isVeg: item.isVeg, rating: item.rating,
+        });
+        toast.success("Added to favourites ❤️");
+      }
+      onFavToggle?.();
+    } catch {
+      toast.error("Failed");
+    }
+  };
+
   const cartItem = cartItems.find(
     (ci) => (ci.id ?? ci._id) === itemId
   );
@@ -87,6 +113,14 @@ export default function FoodCard({ item, index = 0, onDetailClick }) {
             }`}
           />
         </div>
+
+        {/* Favourite Heart */}
+        <button
+          onClick={toggleFav}
+          className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-sm p-1.5 rounded-full hover:bg-black/70 transition"
+        >
+          <Heart size={14} className={isFav ? "text-red-500 fill-red-500" : "text-white/70"} />
+        </button>
       </div>
 
       {/* ── Info ── */}

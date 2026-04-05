@@ -56,6 +56,13 @@ const paymentRoutes = require("./routes/paymentRoutes")
 const reservationRoutes = require("./routes/reservationRoutes")
 const settingsRoutes = require("./routes/settingsRoutes")
 const adminRoutes = require("./routes/adminRoutes")
+const favouriteRoutes = require("./routes/favouriteRoutes")
+const couponRoutes = require("./routes/couponRoutes")
+const flashDealRoutes = require("./routes/flashDealRoutes")
+const feedbackRoutes = require("./routes/feedbackRoutes")
+const chatRoutes = require("./routes/chatRoutes")
+const tableRoutes = require("./routes/tableRoutes")
+const recommendationRoutes = require("./routes/recommendationRoutes")
 
 // ================= API ROUTES =================
 
@@ -67,6 +74,13 @@ app.use("/api/payment", paymentRoutes)
 app.use("/api/reservations", reservationRoutes)
 app.use("/api/settings", settingsRoutes)
 app.use("/api/admin", adminRoutes)
+app.use("/api/favourites", favouriteRoutes)
+app.use("/api/coupons", couponRoutes)
+app.use("/api/flash-deals", flashDealRoutes)
+app.use("/api/feedback", feedbackRoutes)
+app.use("/api/chat", chatRoutes)
+app.use("/api/tables", tableRoutes)
+app.use("/api/recommendations", recommendationRoutes)
 
 // ================= ROOT ROUTE =================
 

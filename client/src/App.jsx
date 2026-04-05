@@ -7,6 +7,8 @@ import Footer from "./components/Footer"
 import BottomNavbar from "./components/MobileBottomNav"
 import CartDrawer from "./components/CartDrawer"
 import ProtectedRoute from "./components/ProtectedRoute"
+import ChatWidget from "./components/ChatWidget"
+import FlashDealBanner from "./components/FlashDealBanner"
 
 import Home from "./pages/Home"
 import Menu from "./pages/Menu"
@@ -20,10 +22,16 @@ import OrderHistory from "./pages/OrderHistory"
 import Profile from "./pages/Profile"
 import Tracking from "./pages/Tracking"
 import BookTable from "./components/BookTable"
+import Favourites from "./pages/Favourites"
 
 import AdminLogin from "./admin/AdminLogin"
 import AdminDashboard from "./admin/AdminDashboard"
 import AdminMenu from "./admin/AdminMenu"
+import AdminCoupons from "./admin/AdminCoupons"
+import AdminFlashDeals from "./admin/AdminFlashDeals"
+import AdminAnalytics from "./admin/AdminAnalytics"
+import AdminChat from "./admin/AdminChat"
+import AdminTables from "./admin/AdminTables"
 
 /* ── Page transition variants ── */
 const pageVariants = {
@@ -75,6 +83,7 @@ function AnimatedRoutes() {
         <Route path="/profile" element={<PageWrap><Profile /></PageWrap>} />
         <Route path="/tracking" element={<PageWrap><Tracking /></PageWrap>} />
         <Route path="/book-table" element={<PageWrap><BookTable /></PageWrap>} />
+        <Route path="/favourites" element={<PageWrap><Favourites /></PageWrap>} />
 
         {/* Admin Routes */}
         <Route path="/admin-login" element={<PageWrap><AdminLogin /></PageWrap>} />
@@ -86,6 +95,31 @@ function AnimatedRoutes() {
         <Route path="/admin-menu" element={
           <ProtectedRoute>
             <PageWrap><AdminMenu /></PageWrap>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-coupons" element={
+          <ProtectedRoute>
+            <PageWrap><AdminCoupons /></PageWrap>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-flash-deals" element={
+          <ProtectedRoute>
+            <PageWrap><AdminFlashDeals /></PageWrap>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-analytics" element={
+          <ProtectedRoute>
+            <PageWrap><AdminAnalytics /></PageWrap>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-chat" element={
+          <ProtectedRoute>
+            <PageWrap><AdminChat /></PageWrap>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin-tables" element={
+          <ProtectedRoute>
+            <PageWrap><AdminTables /></PageWrap>
           </ProtectedRoute>
         } />
       </Routes>
@@ -105,6 +139,9 @@ function AppLayout() {
       {/* Scroll to top on navigation */}
       <ScrollToTop />
 
+      {/* Flash Deal Banner - only on customer pages */}
+      {!isAdminPage && <FlashDealBanner />}
+
       {/* Top Navbar - only on customer pages */}
       {!isAdminPage && <Navbar />}
 
@@ -119,6 +156,9 @@ function AppLayout() {
 
       {/* Cart Drawer - only on customer pages */}
       {!isAdminPage && <CartDrawer />}
+
+      {/* Live Chat Widget - only on customer pages */}
+      {!isAdminPage && <ChatWidget />}
     </>
   )
 }

@@ -58,4 +58,19 @@ router.patch("/:id/toggle", async (req, res) => {
   }
 });
 
+// Seed menu from frontend data (only if DB is empty)
+router.post("/seed", async (req, res) => {
+  try {
+    const count = await Menu.countDocuments();
+    if (count > 0) return res.json({ message: "Menu already has items", count });
+    const items = req.body;
+    if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ message: "No items provided" });
+    const docs = items.map(({ id, ...rest }) => rest);
+    await Menu.insertMany(docs);
+    res.json({ message: `${docs.length} items seeded successfully` });
+  } catch (err) {
+    res.status(500).json({ message: "Seed failed" });
+  }
+});
+
 module.exports = router;

@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { Package, ArrowRight } from "lucide-react";
+import { Package, ArrowRight, RotateCcw, Star } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import InvoiceDownload from "../components/InvoiceDownload";
+import FeedbackPopup from "../components/FeedbackPopup";
 
 const STATUS_COLORS = {
   Pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
@@ -16,7 +19,10 @@ const STATUS_COLORS = {
 export default function OrderHistory() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [feedbackOrder, setFeedbackOrder] = useState(null);
+  const [feedbackDone, setFeedbackDone] = useState({});
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const fetchOrders = async () => {
     try {
@@ -130,19 +136,59 @@ export default function OrderHistory() {
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/tracking?orderId=${order._id || order.id}`)}
-                    className="flex items-center gap-1.5 text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition"
-                  >
-                    Track
-                    <ArrowRight size={12} />
-                  </button>
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    {/* Repeat Order */}
+                    <button
+                      onClick={() => {
+                        order.items.forEach(item => addToCart({ ...item, _id: item.id || item._id }));
+                        navigate("/cart");
+                      }}
+                      className="flex items-center gap-1.5 text-xs font-medium bg-white/[0.06] text-white/60 border border-white/10 px-3 py-1.5 rounded-lg hover:bg-white/10 hover:text-white transition"
+                    >
+                      <RotateCcw size={12} />
+                      Reorder
+                    </button>
+
+                    {/* Invoice */}
+                    <InvoiceDownload order={order} />
+
+                    {/* Feedback - only for delivered orders */}
+                    {order.status === "Delivered" && !feedbackDone[order._id || order.id] && (
+                      <button
+                        onClick={() => setFeedbackOrder(order)}
+                        className="flex items-center gap-1.5 text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1.5 rounded-lg hover:bg-green-500/20 transition"
+                      >
+                        <Star size={12} />
+                        Rate
+                      </button>
+                    )}
+
+                    {/* Track */}
+                    <button
+                      onClick={() => navigate(`/tracking?orderId=${order._id || order.id}`)}
+                      className="flex items-center gap-1.5 text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-lg hover:bg-amber-500/20 transition"
+                    >
+                      Track
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
                 </div>
 
               </motion.div>
             ))}
 
           </div>
+        )}
+
+        {/* Feedback Popup */}
+        {feedbackOrder && (
+          <FeedbackPopup
+            order={feedbackOrder}
+            onClose={() => {
+              setFeedbackDone(prev => ({ ...prev, [feedbackOrder._id || feedbackOrder.id]: true }));
+              setFeedbackOrder(null);
+            }}
+          />
         )}
 
       </div>

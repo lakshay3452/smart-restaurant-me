@@ -7,56 +7,41 @@ import FoodCard from "../components/FoodCard";
 import ProductDetailModal from "../components/ProductDetailModal";
 import "./Menu.css";
 
-/* ───────────── Rich Menu Data ───────────── */
-const MENU_DATA = [
-  // Starters
+/* ───────────── Fallback Menu Data (used when API fails) ───────────── */
+const FALLBACK_MENU = [
   { id: 1, name: "Paneer Tikka", description: "Succulent paneer cubes marinated in aromatic tandoori spices, grilled to smoky perfection in clay oven", price: 220, category: "Starters", image: "/paneer-tikka.jpg", isVeg: true, rating: 4.5, bestseller: true },
   { id: 13, name: "Veg Spring Rolls", description: "Crispy golden rolls stuffed with seasoned vegetables, served with sweet chili sauce", price: 180, category: "Starters", image: "/spring-roll.jpg", isVeg: true, rating: 4.2, bestseller: false },
   { id: 25, name: "Mushroom Galawati", description: "Melt-in-mouth mushroom kebabs inspired by Lucknowi royal kitchens", price: 240, category: "Starters", image: "/mushroom-galawati.jpg", isVeg: true, rating: 4.6, bestseller: true },
   { id: 26, name: "Chicken Tikka", description: "Tender chicken pieces marinated in yogurt and spices, char-grilled in tandoor", price: 280, category: "Starters", image: "/chicken-tikka.jpg", isVeg: false, rating: 4.7, bestseller: true },
   { id: 27, name: "Fish Amritsari", description: "Crispy batter-fried fish fillets seasoned with ajwain and chaat masala", price: 320, category: "Starters", image: "/fish-amritsari.jpg", isVeg: false, rating: 4.4, bestseller: false },
-
-  // Main Course
   { id: 2, name: "Paneer Butter Masala", description: "Rich and creamy tomato-based curry with soft paneer cubes, finished with butter and cream", price: 260, category: "Main Course", image: "/paneer-butter-masala.jpg", isVeg: true, rating: 4.7, bestseller: true },
   { id: 3, name: "Dal Makhani", description: "Slow-cooked black lentils in a rich buttery gravy, simmered overnight for deep flavour", price: 240, category: "Main Course", image: "/dal-makhani.jpg", isVeg: true, rating: 4.6, bestseller: true },
   { id: 14, name: "Mix Veg Curry", description: "Fresh seasonal vegetables cooked in aromatic gravy with whole spices", price: 230, category: "Main Course", image: "/mix-veg.jpg", isVeg: true, rating: 4.1, bestseller: false },
   { id: 15, name: "Kadai Paneer", description: "Paneer cubes tossed with capsicum in a spicy kadai masala gravy", price: 270, category: "Main Course", image: "/kadai-paneer.jpg", isVeg: true, rating: 4.4, bestseller: false },
   { id: 28, name: "Butter Chicken", description: "Tender chicken in a luscious tomato-butter gravy, a timeless North Indian classic", price: 300, category: "Main Course", image: "/butter-chicken.jpg", isVeg: false, rating: 4.8, bestseller: true },
   { id: 29, name: "Mutton Rogan Josh", description: "Aromatic Kashmiri-style mutton curry slow-cooked with whole spices", price: 380, category: "Main Course", image: "/mutton-rogan-josh.jpg", isVeg: false, rating: 4.5, bestseller: false },
-
-  // Rice & Biryani
   { id: 4, name: "Veg Biryani", description: "Fragrant basmati rice layered with spiced vegetables and saffron, cooked dum style", price: 250, category: "Rice & Biryani", image: "/veg-biryani.jpg", isVeg: true, rating: 4.3, bestseller: false },
   { id: 7, name: "Plain Rice", description: "Steamed long-grain basmati rice, perfectly fluffy", price: 120, category: "Rice & Biryani", image: "/plain-rice.jpg", isVeg: true, rating: 4.0, bestseller: false },
   { id: 16, name: "Jeera Rice", description: "Aromatic basmati rice tempered with cumin seeds and ghee", price: 160, category: "Rice & Biryani", image: "/jeera-rice.jpg", isVeg: true, rating: 4.2, bestseller: false },
   { id: 30, name: "Chicken Biryani", description: "Royal Hyderabadi-style dum biryani with tender chicken and aromatic spices", price: 320, category: "Rice & Biryani", image: "/chicken-biryani.jpg", isVeg: false, rating: 4.8, bestseller: true },
   { id: 31, name: "Mutton Biryani", description: "Slow-cooked mutton biryani with layered basmati rice and saffron", price: 380, category: "Rice & Biryani", image: "/mutton-biryani.jpg", isVeg: false, rating: 4.7, bestseller: true },
-
-  // Breads
   { id: 8, name: "Butter Naan", description: "Soft leavened bread baked in tandoor, brushed with butter", price: 60, category: "Breads", image: "/butter-naan.jpg", isVeg: true, rating: 4.5, bestseller: true },
   { id: 20, name: "Lachha Paratha", description: "Flaky layered paratha made with whole wheat, crispy and buttery", price: 60, category: "Breads", image: "/lachha-paratha.jpg", isVeg: true, rating: 4.3, bestseller: false },
   { id: 32, name: "Garlic Naan", description: "Tandoor-baked naan topped with garlic, butter and fresh coriander", price: 70, category: "Breads", image: "/garlic-naan.jpg", isVeg: true, rating: 4.6, bestseller: true },
   { id: 33, name: "Tandoori Roti", description: "Traditional whole wheat flatbread baked in clay oven", price: 40, category: "Breads", image: "/tandoori-roti.jpg", isVeg: true, rating: 4.1, bestseller: false },
-
-  // Chinese
   { id: 19, name: "Veg Hakka Noodles", description: "Stir-fried noodles tossed with crunchy vegetables in Indo-Chinese soy sauce", price: 190, category: "Chinese", image: "/hakka-noodles.jpg", isVeg: true, rating: 4.2, bestseller: false },
   { id: 22, name: "Chilli Garlic Noodles", description: "Spicy noodles wok-tossed with garlic, green chillies and soy sauce", price: 220, category: "Chinese", image: "/chilli-noodles.jpg", isVeg: true, rating: 4.3, bestseller: false },
   { id: 34, name: "Veg Manchurian", description: "Crispy vegetable balls in a tangy, spicy Manchurian sauce", price: 200, category: "Chinese", image: "/veg-manchurian.jpg", isVeg: true, rating: 4.1, bestseller: false },
   { id: 35, name: "Chicken Fried Rice", description: "Wok-tossed rice with tender chicken, eggs, and vegetables", price: 240, category: "Chinese", image: "/chicken-fried-rice.jpg", isVeg: false, rating: 4.4, bestseller: false },
-
-  // Fast Food
   { id: 17, name: "Veg Burger", description: "Crispy aloo tikki burger with fresh lettuce, tomato and special sauce", price: 80, category: "Fast Food", image: "/veg-burger.jpg", isVeg: true, rating: 4.0, bestseller: false },
   { id: 23, name: "French Fries", description: "Golden crispy potato fries seasoned with peri-peri masala", price: 100, category: "Fast Food", image: "/fries.jpg", isVeg: true, rating: 4.1, bestseller: false },
   { id: 24, name: "Cheese Burger", description: "Juicy patty loaded with melted cheese, pickles, and house sauce", price: 150, category: "Fast Food", image: "/cheese-burger.jpg", isVeg: false, rating: 4.3, bestseller: false },
   { id: 36, name: "Chicken Wrap", description: "Grilled chicken wrapped in tortilla with veggies and mayo", price: 180, category: "Fast Food", image: "/chicken-wrap.jpg", isVeg: false, rating: 4.2, bestseller: false },
-
-  // Beverages
   { id: 9, name: "Mineral Water", description: "Packaged drinking water 500ml", price: 30, category: "Beverages", image: "/mineral-water.jpg", isVeg: true, rating: 4.0, bestseller: false },
   { id: 10, name: "Cold Coffee", description: "Creamy cold coffee blended with ice cream and chocolate drizzle", price: 120, category: "Beverages", image: "/cold-coffee.jpg", isVeg: true, rating: 4.5, bestseller: true },
   { id: 21, name: "Mango Shake", description: "Fresh Alphonso mango milkshake, thick and creamy", price: 80, category: "Beverages", image: "/mango-shake.jpg", isVeg: true, rating: 4.6, bestseller: true },
   { id: 37, name: "Masala Chai", description: "Traditional Indian spiced tea brewed with cardamom and ginger", price: 40, category: "Beverages", image: "/masala-chai.jpg", isVeg: true, rating: 4.4, bestseller: false },
   { id: 38, name: "Fresh Lime Soda", description: "Refreshing lime soda with mint, sweet or salted", price: 60, category: "Beverages", image: "/lime-soda.jpg", isVeg: true, rating: 4.3, bestseller: false },
-
-  // Desserts
   { id: 5, name: "Chocolate Lava Cake", description: "Warm chocolate cake with a molten chocolate center, served with vanilla ice cream", price: 170, category: "Desserts", image: "/chocolate-lava.jpg", isVeg: true, rating: 4.7, bestseller: true },
   { id: 6, name: "Vanilla Ice Cream", description: "Two scoops of premium vanilla bean ice cream", price: 80, category: "Desserts", image: "/vanilla-ice-cream.jpg", isVeg: true, rating: 4.2, bestseller: false },
   { id: 11, name: "Rasmalai", description: "Soft cottage cheese dumplings soaked in saffron-flavored milk", price: 100, category: "Desserts", image: "/rasmalai.jpg", isVeg: true, rating: 4.5, bestseller: true },
@@ -113,9 +98,46 @@ export default function Menu() {
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [showFilters, setShowFilters] = useState(false);
+  const [favourites, setFavourites] = useState([]);
+  const [menuData, setMenuData] = useState(FALLBACK_MENU);
 
   const categoryRefs = useRef({});
   const categoryBarRef = useRef(null);
+
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const fetchFavourites = () => {
+    if (!user?.email) return;
+    fetch(`/api/favourites/${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(data => setFavourites(data || []))
+      .catch(() => {});
+  };
+
+  useEffect(() => { fetchFavourites(); }, []);
+
+  // Fetch menu from API, fallback to hardcoded
+  useEffect(() => {
+    fetch("/api/menu")
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped = data.filter(i => i.available !== false).map(i => ({
+            id: i._id || i.id,
+            name: i.name,
+            description: i.description || "",
+            price: i.price,
+            category: i.category || "Other",
+            image: i.image || "",
+            isVeg: i.isVeg ?? true,
+            rating: i.rating ?? 4.0,
+            bestseller: i.bestseller ?? false,
+          }));
+          setMenuData(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Simulate loading
   useEffect(() => {
@@ -131,7 +153,7 @@ export default function Menu() {
 
   // ── Filter logic ──
   const filteredItems = useMemo(() => {
-    let items = MENU_DATA;
+    let items = menuData;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -147,7 +169,7 @@ export default function Menu() {
     items = items.filter((i) => i.price >= priceRange[0] && i.price <= priceRange[1]);
 
     return items;
-  }, [searchQuery, vegOnly, nonVegOnly, priceRange]);
+  }, [searchQuery, vegOnly, nonVegOnly, priceRange, menuData]);
 
   // ── Group by category ──
   const groupedItems = useMemo(() => {
@@ -486,6 +508,8 @@ export default function Menu() {
                       item={item}
                       index={i}
                       onDetailClick={setSelectedItem}
+                      favourites={favourites}
+                      onFavToggle={fetchFavourites}
                     />
                   ))}
                 </div>

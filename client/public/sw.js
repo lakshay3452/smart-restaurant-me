@@ -1,4 +1,4 @@
-const CACHE_NAME = "lacasa-v1";
+const CACHE_NAME = "lacasa-v2";
 const STATIC_ASSETS = ["/", "/index.html"];
 
 self.addEventListener("install", (event) => {
@@ -28,5 +28,26 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() => caches.match(event.request))
+  );
+});
+
+// Push notification handler
+self.addEventListener("push", (event) => {
+  const data = event.data ? event.data.json() : { title: "LaCasa", body: "You have a new update!" };
+  event.waitUntil(
+    self.registration.showNotification(data.title || "LaCasa", {
+      body: data.body || "Check your order status",
+      icon: "/icons/icon-192x192.png",
+      badge: "/icons/icon-192x192.png",
+      vibrate: [200, 100, 200],
+      data: data.url || "/orders",
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.openWindow(event.notification.data || "/orders")
   );
 });

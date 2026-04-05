@@ -28,6 +28,13 @@ const paymentRoutes = require("../server/routes/paymentRoutes");
 const reservationRoutes = require("../server/routes/reservationRoutes");
 const settingsRoutes = require("../server/routes/settingsRoutes");
 const adminRoutes = require("../server/routes/adminRoutes");
+const favouriteRoutes = require("../server/routes/favouriteRoutes");
+const couponRoutes = require("../server/routes/couponRoutes");
+const flashDealRoutes = require("../server/routes/flashDealRoutes");
+const feedbackRoutes = require("../server/routes/feedbackRoutes");
+const chatRoutes = require("../server/routes/chatRoutes");
+const tableRoutes = require("../server/routes/tableRoutes");
+const recommendationRoutes = require("../server/routes/recommendationRoutes");
 
 // ================= API ROUTES =================
 
@@ -39,6 +46,13 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/favourites", favouriteRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/flash-deals", flashDealRoutes);
+app.use("/api/feedback", feedbackRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/tables", tableRoutes);
+app.use("/api/recommendations", recommendationRoutes);
 
 // ================= ROOT ROUTE =================
 

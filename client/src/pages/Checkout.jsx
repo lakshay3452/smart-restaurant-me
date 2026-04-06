@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Navigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 import toast from "react-hot-toast"
 import { motion, AnimatePresence } from "framer-motion"
@@ -18,6 +18,16 @@ export default function Checkout() {
 
   const { cartItems, totalPrice, clearCart } = useCart()
   const navigate = useNavigate()
+  const isLoggedIn = !!localStorage.getItem("token")
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      toast.error("Please login to place an order")
+      navigate("/login", { state: { from: "/checkout" } })
+    }
+  }, [])
+
+  if (!isLoggedIn) return null
   const [COUPONS, setCOUPONS] = useState(FALLBACK_COUPONS);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
 

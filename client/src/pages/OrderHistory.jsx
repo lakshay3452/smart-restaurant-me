@@ -24,42 +24,27 @@ export default function OrderHistory() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
+  // Check if user is logged in
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
   const fetchOrders = async () => {
+    if (!user?.email) return;
     try {
-      // Try fetching from DB using email
-      const user = JSON.parse(localStorage.getItem("user") || "null");
-      if (user?.email) {
-        const res = await axios.get(`/api/orders/my-orders/${encodeURIComponent(user.email)}`);
-        if (res.data && res.data.length > 0) {
-          setOrders(res.data);
-          setLoading(false);
-          return;
-        }
-      }
-      // Fallback to localStorage
-      const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-      // Try to fetch live status for each saved order
-      const updated = await Promise.all(
-        savedOrders.map(async (order) => {
-          try {
-            const res = await axios.get(`/api/orders/track/${order.id}`);
-            return { ...order, status: res.data.status, totalAmount: res.data.totalAmount };
-          } catch {
-            return order;
-          }
-        })
-      );
-      setOrders(updated);
+      const res = await axios.get(`/api/orders/my-orders/${encodeURIComponent(user.email)}`);
+      setOrders(res.data || []);
     } catch {
-      const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-      setOrders(savedOrders);
+      setOrders([]);
     }
     setLoading(false);
   };
 
   useEffect(() => {
+    if (!user?.email) {
+      navigate("/login", { replace: true });
+      return;
+    }
     fetchOrders();
-    const interval = setInterval(fetchOrders, 10000); // refresh every 10s
+    const interval = setInterval(fetchOrders, 10000);
     return () => clearInterval(interval);
   }, []);
 

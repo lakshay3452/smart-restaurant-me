@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { LogOut, Package, User, Mail } from "lucide-react";
+import axios from "axios";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -11,11 +12,15 @@ export default function Profile() {
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsed = JSON.parse(savedUser);
+      setUser(parsed);
+      // Fetch orders from API for this user
+      if (parsed?.email) {
+        axios.get(`/api/orders/my-orders/${encodeURIComponent(parsed.email)}`)
+          .then(res => setOrders(res.data || []))
+          .catch(() => setOrders([]));
+      }
     }
-
-    const savedOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-    setOrders(savedOrders);
   }, []);
 
   const handleLogout = () => {

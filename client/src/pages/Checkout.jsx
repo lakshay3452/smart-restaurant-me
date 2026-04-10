@@ -56,12 +56,16 @@ export default function Checkout() {
     }
   }
 
-  // Phone validation (only numbers & max 10 digits)
+  // Phone validation (Indian mobile: must start with 6-9, 10 digits)
   const handlePhoneChange = (e)=>{
     const value = e.target.value
     if(/^\d{0,10}$/.test(value)){
       setPhone(value)
     }
+  }
+
+  const isValidIndianPhone = (num) => {
+    return /^[6-9]\d{9}$/.test(num)
   }
 
   const taxes = Math.round(totalPrice * 0.05)
@@ -103,8 +107,8 @@ export default function Checkout() {
     e.preventDefault()
 
     // Final validation
-    if(phone.length !== 10){
-      toast.error("Phone number must be exactly 10 digits")
+    if(!isValidIndianPhone(phone)){
+      toast.error("Please enter a valid Indian mobile number (starting with 6-9)")
       return
     }
 
@@ -205,15 +209,21 @@ export default function Checkout() {
 
             <div>
               <label className="text-white/40 text-xs sm:text-sm mb-1.5 block">Phone Number</label>
-              <input
-                type="text"
-                placeholder="10-digit phone number"
-                value={phone}
-                onChange={handlePhoneChange}
-                className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 text-sm transition"
-                maxLength="10"
-                required
-              />
+              <div className="flex">
+                <span className="inline-flex items-center px-3 py-3 bg-white/[0.1] border border-white/10 border-r-0 rounded-l-xl text-amber-400 text-sm font-semibold select-none">+91</span>
+                <input
+                  type="text"
+                  placeholder="Enter 10-digit mobile number"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  className="w-full px-4 py-3 bg-white/[0.06] border border-white/10 rounded-r-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 text-sm transition"
+                  maxLength="10"
+                  required
+                />
+              </div>
+              {phone && !isValidIndianPhone(phone) && phone.length === 10 && (
+                <p className="text-red-400 text-xs mt-1">Invalid Indian mobile number. Must start with 6, 7, 8, or 9.</p>
+              )}
             </div>
 
             <div>

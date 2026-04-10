@@ -139,6 +139,11 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Email is required for order confirmation" })
     }
 
+    // Validate Indian mobile number (must start with 6-9 and be 10 digits)
+    if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({ message: "Please enter a valid Indian mobile number" })
+    }
+
     const order = new Order({
       name,
       email,

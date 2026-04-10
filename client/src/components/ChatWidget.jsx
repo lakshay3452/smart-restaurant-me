@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
 import axios from "axios";
@@ -12,7 +12,17 @@ export default function ChatWidget() {
   const pollRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "null");
-  const conversationId = user?.email || "guest_" + Date.now();
+
+  // Stable conversationId — for guests, create once and store in sessionStorage
+  const conversationId = useMemo(() => {
+    if (user?.email) return user.email;
+    let guestId = sessionStorage.getItem("chat_guest_id");
+    if (!guestId) {
+      guestId = "guest_" + Date.now();
+      sessionStorage.setItem("chat_guest_id", guestId);
+    }
+    return guestId;
+  }, [user?.email]);
 
   const fetchMessages = async () => {
     try {
@@ -72,9 +82,6 @@ export default function ChatWidget() {
           onClick={() => setOpen(!open)}
           className="relative bg-amber-500 text-black p-3.5 rounded-full shadow-lg shadow-amber-500/30 hover:bg-amber-400 transition-all hover:scale-110 active:scale-95"
         >
-          {!open && (
-            <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-[#0b0b0b] animate-pulse" />
-          )}
           {open ? <X size={22} /> : <MessageCircle size={22} />}
         </button>
       </div>

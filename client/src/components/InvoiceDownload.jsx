@@ -49,7 +49,7 @@ td { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
   <div>
     <p class="label">Customer</p>
     <p>${order.name || "—"}</p>
-    <p>${order.phone || ""}</p>
+    <p>${order.phone ? "+91 " + order.phone : ""}</p>
   </div>
   <div>
     <p class="label">Delivery Address</p>

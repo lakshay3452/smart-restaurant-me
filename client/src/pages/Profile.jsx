@@ -204,7 +204,7 @@ export default function Profile() {
                             <Users size={12} /> {reservation.guests} guests
                           </span>
                           <span className="flex items-center gap-1">
-                            <Phone size={12} /> {reservation.phone}
+                            <Phone size={12} /> +91 {reservation.phone}
                           </span>
                         </div>
                       </div>

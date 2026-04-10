@@ -11,6 +11,10 @@ router.post("/", async (req, res) => {
       console.log("Missing fields. Name:", name, "Phone:", phone, "Guests:", guests, "Date:", date, "Time:", time);
       return res.status(400).json({ message: "All fields are required" });
     }
+    // Validate Indian mobile number (must start with 6-9 and be 10 digits)
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      return res.status(400).json({ message: "Please enter a valid Indian mobile number" });
+    }
     const reservation = new Reservation({ name, email: email || "", phone, guests, date, time });
     await reservation.save();
     console.log("Reservation created successfully:", reservation._id);

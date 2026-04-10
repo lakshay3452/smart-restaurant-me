@@ -289,7 +289,7 @@ export default function AdminDashboard() {
                 </h2>
 
                 <p>Name: {order.name}</p>
-                <p>Phone: {order.phone}</p>
+                <p>Phone: +91 {order.phone}</p>
                 <p>Address: {order.address}</p>
 
                 <div className="mt-4">
@@ -384,7 +384,7 @@ export default function AdminDashboard() {
                 </h2>
 
                 <p className="mb-1">Name: <span className="font-semibold">{reservation.name}</span></p>
-                <p className="mb-1">Phone: <span className="font-semibold">{reservation.phone}</span></p>
+                <p className="mb-1">Phone: <span className="font-semibold">+91 {reservation.phone}</span></p>
                 <p className="mb-1">Guests: <span className="font-semibold">{reservation.guests} people</span></p>
                 <p className="mb-1">Date: <span className="font-semibold">{reservation.date}</span></p>
                 <p className="mb-4">Time: <span className="font-semibold">{reservation.time}</span></p>

@@ -23,6 +23,8 @@ export default function BookTable() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const isValidIndianPhone = (num) => /^[6-9]\d{9}$/.test(num);
+
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const handleSubmit = async (e) => {
@@ -33,8 +35,8 @@ export default function BookTable() {
       return;
     }
 
-    if (!phone || phone.length !== 10) {
-      toast.error("Please enter a valid 10-digit phone number");
+    if (!phone || !isValidIndianPhone(phone)) {
+      toast.error("Please enter a valid Indian mobile number (starting with 6-9)");
       return;
     }
 
@@ -123,15 +125,21 @@ export default function BookTable() {
               <label className="flex items-center gap-2 text-xs sm:text-sm text-white/50 mb-2">
                 <Phone size={14} className="text-amber-400" /> Phone Number
               </label>
-              <input
-                type="tel"
-                required
-                maxLength="10"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                placeholder="10-digit phone number"
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/[0.08] focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 outline-none text-white placeholder-white/25 text-sm transition"
-              />
+              <div className="flex">
+                <span className="inline-flex items-center px-3 py-3 bg-white/[0.08] border border-white/[0.08] border-r-0 rounded-l-xl text-amber-400 text-sm font-semibold select-none">+91</span>
+                <input
+                  type="tel"
+                  required
+                  maxLength="10"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Enter 10-digit mobile number"
+                  className="w-full px-4 py-3 rounded-r-xl bg-white/[0.05] border border-white/[0.08] focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/25 outline-none text-white placeholder-white/25 text-sm transition"
+                />
+              </div>
+              {phone && !isValidIndianPhone(phone) && phone.length === 10 && (
+                <p className="text-red-400 text-xs mt-1">Invalid Indian mobile number. Must start with 6, 7, 8, or 9.</p>
+              )}
             </div>
 
             {/* Guests */}
@@ -231,7 +239,7 @@ export default function BookTable() {
             <div className="space-y-4 flex-1">
               {[
                 { label: "Name", value: name, icon: <User size={14} /> },
-                { label: "Phone", value: phone, icon: <Phone size={14} /> },
+                { label: "Phone", value: phone ? `+91 ${phone}` : "", icon: <Phone size={14} /> },
                 { label: "Guests", value: guests, icon: <Users size={14} /> },
                 { label: "Date", value: date, icon: <CalendarDays size={14} /> },
                 { label: "Time", value: time, icon: <Clock size={14} /> },

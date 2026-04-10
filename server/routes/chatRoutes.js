@@ -2,6 +2,32 @@ const express = require("express");
 const router = express.Router();
 const ChatMessage = require("../models/ChatMessage");
 
+// Get all conversations (admin) - grouped by conversationId
+// IMPORTANT: This must be BEFORE /:conversationId to avoid being caught by the wildcard
+router.get("/admin/conversations", async (req, res) => {
+  try {
+    const conversations = await ChatMessage.aggregate([
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$conversationId",
+          lastMessage: { $first: "$message" },
+          lastSender: { $first: "$sender" },
+          lastTime: { $first: "$createdAt" },
+          senderEmail: { $first: "$senderEmail" },
+          unreadCount: {
+            $sum: { $cond: [{ $and: [{ $eq: ["$sender", "user"] }, { $eq: ["$read", false] }] }, 1, 0] }
+          }
+        }
+      },
+      { $sort: { lastTime: -1 } }
+    ]);
+    res.json(conversations);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch conversations" });
+  }
+});
+
 // Get messages for a conversation
 router.get("/:conversationId", async (req, res) => {
   try {
@@ -39,31 +65,6 @@ router.put("/read/:conversationId/:reader", async (req, res) => {
     res.json({ message: "Marked as read" });
   } catch (err) {
     res.status(500).json({ message: "Failed to mark as read" });
-  }
-});
-
-// Get all conversations (admin) - grouped by conversationId
-router.get("/admin/conversations", async (req, res) => {
-  try {
-    const conversations = await ChatMessage.aggregate([
-      { $sort: { createdAt: -1 } },
-      {
-        $group: {
-          _id: "$conversationId",
-          lastMessage: { $first: "$message" },
-          lastSender: { $first: "$sender" },
-          lastTime: { $first: "$createdAt" },
-          senderEmail: { $first: "$senderEmail" },
-          unreadCount: {
-            $sum: { $cond: [{ $and: [{ $eq: ["$sender", "user"] }, { $eq: ["$read", false] }] }, 1, 0] }
-          }
-        }
-      },
-      { $sort: { lastTime: -1 } }
-    ]);
-    res.json(conversations);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to fetch conversations" });
   }
 });
 

@@ -73,7 +73,7 @@ export default function ChatWidget() {
           <motion.span
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-amber-500 text-black text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg hidden sm:block"
+            className="bg-amber-500 text-black text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg"
           >
             Chat with us
           </motion.span>

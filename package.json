@@ -1,8 +1,8 @@
 {
   "name": "restaurant-app",
   "private": true,
-  "version": "1.0.0",
-  "description": "Smart Restaurant - Full Stack Application",
+  "version": "2.0.0",
+  "description": "LaCasa — Smart Restaurant Full Stack Application",
   "scripts": {
     "install-all": "npm install && cd client && npm install --legacy-peer-deps && cd ../server && npm install",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
@@ -11,14 +11,17 @@
     "build": "cd client && npm install --legacy-peer-deps && npm run build",
     "vercel-build": "cd client && npm install --legacy-peer-deps && npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["restaurant", "food-ordering", "mern-stack"],
+  "author": "Lakshay",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "nodemailer": "^8.0.3",

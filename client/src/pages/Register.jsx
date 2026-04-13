@@ -10,6 +10,7 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [step, setStep] = useState(1); // 1 = form, 2 = OTP verify
   const [loading, setLoading] = useState(false);
@@ -85,6 +86,16 @@ export default function Register() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
+      // Apply referral code if provided
+      if (referralCode.trim()) {
+        try {
+          await axios.post("/api/referral/apply", { referralCode: referralCode.trim() }, {
+            headers: { Authorization: `Bearer ${res.data.token}` },
+          });
+          toast.success("Referral bonus applied! 🎉");
+        } catch {}
+      }
+
       toast.success("Registered successfully!");
       navigate("/");
     } catch (err) {
@@ -153,6 +164,17 @@ export default function Register() {
                   className="w-full bg-transparent outline-none text-white placeholder-gray-400"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="border border-white/30 rounded-xl px-4 py-3">
+                <input
+                  type="text"
+                  placeholder="Referral Code (optional)"
+                  className="w-full bg-transparent outline-none text-white placeholder-gray-400"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  maxLength={10}
                 />
               </div>
 

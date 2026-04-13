@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send } from "lucide-react";
 import axios from "axios";
 
-export default function ChatWidget() {
+export default function ChatWidget({ inline = false }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -65,26 +65,34 @@ export default function ChatWidget() {
     }
   };
 
+  const chatWindowClass = inline
+    ? "absolute bottom-full right-0 z-[9999] w-full sm:w-96 bg-[#111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+    : "fixed bottom-52 right-4 md:bottom-20 md:right-6 z-[9999] w-80 sm:w-96 bg-[#111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl";
+
   return (
     <>
-      {/* Floating Button */}
-      <div className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-[55] flex items-center gap-2">
-        {!open && (
-          <motion.span
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-amber-500 text-black text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg"
-          >
-            Chat with us
-          </motion.span>
+      {/* Chat Button */}
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={inline
+          ? "inline-flex items-center justify-center gap-2 min-w-[180px] bg-amber-500 text-black px-4 py-2 rounded-full shadow-lg shadow-amber-500/30 hover:bg-amber-400 transition-all hover:scale-[1.02] active:scale-95 pointer-events-auto"
+          : "fixed bottom-36 right-4 md:bottom-6 md:right-6 z-[9999] bg-amber-500 text-black p-3.5 rounded-full shadow-lg shadow-amber-500/30 hover:bg-amber-400 transition-all hover:scale-110 active:scale-95 pointer-events-auto"
+        }
+        style={{ touchAction: "manipulation" }}
+        aria-label={open ? "Close chat" : "Open chat"}
+      >
+        {open ? <X size={22} /> : (
+          inline ? (
+            <>
+              <MessageCircle size={18} />
+              Chat with us
+            </>
+          ) : (
+            <MessageCircle size={22} />
+          )
         )}
-        <button
-          onClick={() => setOpen(!open)}
-          className="relative bg-amber-500 text-black p-3.5 rounded-full shadow-lg shadow-amber-500/30 hover:bg-amber-400 transition-all hover:scale-110 active:scale-95"
-        >
-          {open ? <X size={22} /> : <MessageCircle size={22} />}
-        </button>
-      </div>
+      </button>
 
       {/* Chat Window */}
       <AnimatePresence>
@@ -93,7 +101,7 @@ export default function ChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-36 right-4 md:bottom-20 md:right-6 z-[55] w-80 sm:w-96 bg-[#111] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+            className={chatWindowClass}
           >
             {/* Header */}
             <div className="bg-amber-500 px-4 py-3 flex items-center justify-between">

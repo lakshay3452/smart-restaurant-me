@@ -19,11 +19,14 @@ router.get("/", authMiddleware, async (req, res) => {
     let referral = await Referral.findOne({ referrerId: req.user._id });
 
     if (!referral) {
+      const user = await User.findById(req.user._id);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
       const code = generateReferralCode();
       referral = new Referral({
         referrerId: req.user._id,
-        referrerName: req.user.name,
-        referrerEmail: req.user.email,
+        referrerName: user.name,
+        referrerEmail: user.email,
         referralCode: code,
       });
       await referral.save();
@@ -57,9 +60,10 @@ router.post("/apply", authMiddleware, async (req, res) => {
     }
 
     // Add referred user
+    const currentUser = await User.findById(req.user._id);
     referral.referredUsers.push({
       userId: req.user._id,
-      email: req.user.email,
+      email: currentUser?.email || "unknown",
       joinedAt: new Date(),
       bonusApplied: false,
     });

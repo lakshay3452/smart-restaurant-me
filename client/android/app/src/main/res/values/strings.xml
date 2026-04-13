@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LaCasa</string>
+    <string name="title_activity_main">LaCasa</string>
+    <string name="package_name">com.lacasa.smartrestaurant</string>
+    <string name="custom_url_scheme">com.lacasa.smartrestaurant</string>
+</resources>

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, LogIn, LogOut, Heart } from "lucide-react";
+import { ShoppingCart, User, Menu, X, LogIn, LogOut, Heart, Trophy } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useEffect, useRef, useState } from "react";
 
@@ -115,6 +115,13 @@ export default function Navbar() {
             </button>
           )}
 
+          {isLoggedIn && (
+            <button onClick={() => navigate("/rewards")} className="hover:text-amber-400 flex items-center gap-1">
+              <Trophy size={18} />
+              Rewards
+            </button>
+          )}
+
           {isLoggedIn ? (
             <div className="flex items-center gap-4">
               <button
@@ -217,6 +224,16 @@ export default function Navbar() {
               >
                 <Heart size={18} />
                 Favourites
+              </button>
+            )}
+
+            {isLoggedIn && (
+              <button
+                onClick={() => { navigate("/rewards"); setMobileMenuOpen(false); }}
+                className="hover:text-amber-400 flex items-center gap-2 text-left"
+              >
+                <Trophy size={18} />
+                Rewards
               </button>
             )}
 

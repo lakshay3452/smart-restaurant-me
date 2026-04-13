@@ -1,10 +1,11 @@
 import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ArrowUpRight, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import ChatWidget from "./ChatWidget";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] text-white mt-10">
+    <footer className="relative border-t border-white/[0.06] text-white mt-10">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
 
@@ -75,6 +76,14 @@ export default function Footer() {
             </div>
           </div>
 
+        </div>
+
+        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+          <div className="text-center sm:text-left">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-white/70">Need help?</h3>
+            <p className="text-white/40 text-sm">Start a chat with our support team right from the footer.</p>
+          </div>
+          <ChatWidget inline />
         </div>
 
         {/* Bottom Bar */}

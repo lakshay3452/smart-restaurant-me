@@ -2,22 +2,32 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { Wallet } from "lucide-react";
 
 export default function Payment() {
   const { totalPrice } = useCart();
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
 
-  // Load Razorpay script
+  // Load Razorpay script & fetch wallet
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     document.body.appendChild(script);
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("/api/wallet", { headers: { Authorization: `Bearer ${token}` } })
+        .then(r => r.json())
+        .then(data => setWalletBalance(data?.balance || 0))
+        .catch(() => {});
+    }
   }, []);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (totalPrice === 0) {
       toast.error("Cart is empty!");
       return;
@@ -27,6 +37,29 @@ export default function Payment() {
       // Cash on Delivery
       toast.success("Order placed! Pay on delivery 📦");
       setTimeout(() => navigate("/success"), 1500);
+      return;
+    }
+
+    if (paymentMethod === "wallet") {
+      if (walletBalance < totalPrice) {
+        toast.error("Insufficient wallet balance");
+        return;
+      }
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        await fetch("/api/wallet/use-balance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ amount: totalPrice, description: "Food order payment" }),
+        });
+        toast.success("Paid from wallet! 💰");
+        setTimeout(() => navigate("/success"), 1500);
+      } catch {
+        toast.error("Wallet payment failed");
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
@@ -92,6 +125,14 @@ export default function Payment() {
           <label className="flex items-center gap-3 bg-white/[0.04] border border-white/[0.06] p-3 sm:p-4 rounded-xl cursor-pointer hover:bg-white/[0.08] transition text-sm sm:text-base">
             <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-amber-500" />
             <span>Cash on Delivery</span>
+          </label>
+
+          <label className="flex items-center gap-3 bg-white/[0.04] border border-white/[0.06] p-3 sm:p-4 rounded-xl cursor-pointer hover:bg-white/[0.08] transition text-sm sm:text-base">
+            <input type="radio" name="payment" value="wallet" checked={paymentMethod === "wallet"} onChange={(e) => setPaymentMethod(e.target.value)} className="accent-amber-500" />
+            <div className="flex items-center justify-between flex-1">
+              <span className="flex items-center gap-2"><Wallet size={16} className="text-blue-400" /> Wallet</span>
+              <span className="text-xs text-white/40">Balance: ₹{walletBalance.toFixed(0)}</span>
+            </div>
           </label>
 
         </div>

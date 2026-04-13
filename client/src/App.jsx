@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect, lazy, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import Navbar from "./components/Navbar"
@@ -7,32 +7,34 @@ import Footer from "./components/Footer"
 import BottomNavbar from "./components/MobileBottomNav"
 import CartDrawer from "./components/CartDrawer"
 import ProtectedRoute from "./components/ProtectedRoute"
-import ChatWidget from "./components/ChatWidget"
 import FlashDealBanner from "./components/FlashDealBanner"
+import PageLoader from "./components/PageLoader"
 
-import Home from "./pages/Home"
-import Menu from "./pages/Menu"
-import Cart from "./pages/Cart"
-import Checkout from "./pages/Checkout"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import Payment from "./pages/Payment"
-import OrderSuccess from "./pages/OrderSuccess"
-import OrderHistory from "./pages/OrderHistory"
-import Profile from "./pages/Profile"
-import Tracking from "./pages/Tracking"
-import BookTable from "./components/BookTable"
-import Favourites from "./pages/Favourites"
-import ForgotPassword from "./pages/ForgotPassword"
+// ── Lazy-loaded pages (code splitting) ──
+const Home = lazy(() => import("./pages/Home"))
+const Menu = lazy(() => import("./pages/Menu"))
+const Cart = lazy(() => import("./pages/Cart"))
+const Checkout = lazy(() => import("./pages/Checkout"))
+const Login = lazy(() => import("./pages/Login"))
+const Register = lazy(() => import("./pages/Register"))
+const Payment = lazy(() => import("./pages/Payment"))
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"))
+const OrderHistory = lazy(() => import("./pages/OrderHistory"))
+const Profile = lazy(() => import("./pages/Profile"))
+const Tracking = lazy(() => import("./pages/Tracking"))
+const BookTable = lazy(() => import("./components/BookTable"))
+const Favourites = lazy(() => import("./pages/Favourites"))
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
+const FeaturesPage = lazy(() => import("./pages/FeaturesPage"))
 
-import AdminLogin from "./admin/AdminLogin"
-import AdminDashboard from "./admin/AdminDashboard"
-import AdminMenu from "./admin/AdminMenu"
-import AdminCoupons from "./admin/AdminCoupons"
-import AdminFlashDeals from "./admin/AdminFlashDeals"
-import AdminAnalytics from "./admin/AdminAnalytics"
-import AdminChat from "./admin/AdminChat"
-import AdminTables from "./admin/AdminTables"
+const AdminLogin = lazy(() => import("./admin/AdminLogin"))
+const AdminDashboard = lazy(() => import("./admin/AdminDashboard"))
+const AdminMenu = lazy(() => import("./admin/AdminMenu"))
+const AdminCoupons = lazy(() => import("./admin/AdminCoupons"))
+const AdminFlashDeals = lazy(() => import("./admin/AdminFlashDeals"))
+const AdminAnalytics = lazy(() => import("./admin/AdminAnalytics"))
+const AdminChat = lazy(() => import("./admin/AdminChat"))
+const AdminTables = lazy(() => import("./admin/AdminTables"))
 
 /* ── Page transition variants ── */
 const pageVariants = {
@@ -69,26 +71,28 @@ function ScrollToTop() {
 function AnimatedRoutes() {
   const location = useLocation()
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        {/* Customer Routes */}
-        <Route path="/" element={<PageWrap><Home /></PageWrap>} />
-        <Route path="/menu" element={<PageWrap><Menu /></PageWrap>} />
-        <Route path="/cart" element={<PageWrap><Cart /></PageWrap>} />
-        <Route path="/checkout" element={<PageWrap><Checkout /></PageWrap>} />
-        <Route path="/login" element={<PageWrap><Login /></PageWrap>} />
-        <Route path="/register" element={<PageWrap><Register /></PageWrap>} />
-        <Route path="/forgot-password" element={<PageWrap><ForgotPassword /></PageWrap>} />
-        <Route path="/payment" element={<PageWrap><Payment /></PageWrap>} />
-        <Route path="/success" element={<PageWrap><OrderSuccess /></PageWrap>} />
-        <Route path="/orders" element={<PageWrap><OrderHistory /></PageWrap>} />
-        <Route path="/profile" element={<PageWrap><Profile /></PageWrap>} />
-        <Route path="/tracking" element={<PageWrap><Tracking /></PageWrap>} />
-        <Route path="/book-table" element={<PageWrap><BookTable /></PageWrap>} />
-        <Route path="/favourites" element={<PageWrap><Favourites /></PageWrap>} />
+    <Suspense fallback={<PageLoader />}>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          {/* Customer Routes */}
+          <Route path="/" element={<PageWrap><Home /></PageWrap>} />
+          <Route path="/menu" element={<PageWrap><Menu /></PageWrap>} />
+          <Route path="/cart" element={<PageWrap><Cart /></PageWrap>} />
+          <Route path="/checkout" element={<PageWrap><Checkout /></PageWrap>} />
+          <Route path="/login" element={<PageWrap><Login /></PageWrap>} />
+          <Route path="/register" element={<PageWrap><Register /></PageWrap>} />
+          <Route path="/forgot-password" element={<PageWrap><ForgotPassword /></PageWrap>} />
+          <Route path="/payment" element={<PageWrap><Payment /></PageWrap>} />
+          <Route path="/success" element={<PageWrap><OrderSuccess /></PageWrap>} />
+          <Route path="/orders" element={<PageWrap><OrderHistory /></PageWrap>} />
+          <Route path="/profile" element={<PageWrap><Profile /></PageWrap>} />
+          <Route path="/tracking" element={<PageWrap><Tracking /></PageWrap>} />
+          <Route path="/book-table" element={<PageWrap><BookTable /></PageWrap>} />
+          <Route path="/favourites" element={<PageWrap><Favourites /></PageWrap>} />
+          <Route path="/rewards" element={<PageWrap><FeaturesPage /></PageWrap>} />
 
-        {/* Admin Routes */}
-        <Route path="/admin-login" element={<PageWrap><AdminLogin /></PageWrap>} />
+          {/* Admin Routes */}
+          <Route path="/admin-login" element={<PageWrap><AdminLogin /></PageWrap>} />
         <Route path="/admin" element={
           <ProtectedRoute>
             <PageWrap><AdminDashboard /></PageWrap>
@@ -125,7 +129,8 @@ function AnimatedRoutes() {
           </ProtectedRoute>
         } />
       </Routes>
-    </AnimatePresence>
+      </AnimatePresence>
+    </Suspense>
   )
 }
 
@@ -158,9 +163,6 @@ function AppLayout() {
 
       {/* Cart Drawer - only on customer pages */}
       {!isAdminPage && <CartDrawer />}
-
-      {/* Live Chat Widget - only on customer pages */}
-      {!isAdminPage && <ChatWidget />}
     </>
   )
 }

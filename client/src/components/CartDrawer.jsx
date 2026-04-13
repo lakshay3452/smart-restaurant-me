@@ -21,7 +21,7 @@ export default function CartDrawer() {
       {/* ── Floating Cart Button ── */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-[9997] bg-amber-500 text-black p-3.5 rounded-full shadow-xl shadow-amber-500/30 hover:scale-110 hover:bg-amber-400 transition-all active:scale-95"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-20 z-[9997] bg-amber-500 text-black p-3.5 rounded-full shadow-xl shadow-amber-500/30 hover:scale-110 hover:bg-amber-400 transition-all active:scale-95"
       >
         <ShoppingBag size={22} />
         {itemCount > 0 && (

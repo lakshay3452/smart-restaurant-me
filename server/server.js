@@ -1,25 +1,71 @@
 const express = require("express")
 const cors = require("cors")
 const dotenv = require("dotenv")
+const helmet = require("helmet")
+const compression = require("compression")
+const mongoSanitize = require("express-mongo-sanitize")
+const hpp = require("hpp")
 const rateLimit = require("express-rate-limit")
 const connectDB = require("./config/db")
 
 // Load env variables
 dotenv.config()
 
+// ── Validate required env variables ──
+const requiredEnv = ["MONGO_URI", "JWT_SECRET", "EMAIL_USER", "EMAIL_PASS"]
+const missingEnv = requiredEnv.filter((key) => !process.env[key])
+if (missingEnv.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnv.join(", ")}`)
+  process.exit(1)
+}
+
 const app = express()
 
 const PORT = process.env.PORT || 5000
 
-// ================= MIDDLEWARE =================
+// ================= SECURITY MIDDLEWARE =================
 
-app.use(cors())
-app.use(express.json())
+// Security headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // Disable CSP for API server
+}))
+
+// Gzip compression
+app.use(compression())
+
+// CORS with proper config
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : ["http://localhost:5173", "http://localhost:5174"]
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(null, true) // Allow all in development; tighten in production
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}))
+
+// Body parsing with size limits
+app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ extended: true, limit: "10mb" }))
+
+// Sanitize data against NoSQL injection
+app.use(mongoSanitize())
+
+// Prevent HTTP parameter pollution
+app.use(hpp())
 
 // ── Rate Limiting ──
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per window
+  max: 200, // limit each IP to 200 requests per window
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: "Too many requests, please try again after 15 minutes" }
@@ -36,11 +82,11 @@ const authLimiter = rateLimit({
 app.use("/api/", apiLimiter)
 app.use("/api/auth/", authLimiter)
 
-// Log all requests
+// Request logging
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`)
+  next()
+})
 
 // ================= CONNECT DATABASE =================
 
@@ -63,6 +109,9 @@ const feedbackRoutes = require("./routes/feedbackRoutes")
 const chatRoutes = require("./routes/chatRoutes")
 const tableRoutes = require("./routes/tableRoutes")
 const recommendationRoutes = require("./routes/recommendationRoutes")
+const loyaltyRoutes = require("./routes/loyaltyRoutes")
+const walletRoutes = require("./routes/walletRoutes")
+const referralRoutes = require("./routes/referralRoutes")
 
 // ================= API ROUTES =================
 
@@ -81,6 +130,9 @@ app.use("/api/feedback", feedbackRoutes)
 app.use("/api/chat", chatRoutes)
 app.use("/api/tables", tableRoutes)
 app.use("/api/recommendations", recommendationRoutes)
+app.use("/api/loyalty", loyaltyRoutes)
+app.use("/api/wallet", walletRoutes)
+app.use("/api/referral", referralRoutes)
 
 // ================= ROOT ROUTE =================
 
@@ -99,23 +151,40 @@ app.use((req, res) => {
 // ================= ERROR HANDLER =================
 
 app.use((err, req, res, next) => {
-  console.error("Error:", err.message)
-  res.status(err.status || 500).json({
-    message: err.message || "Server Error",
-    error: process.env.NODE_ENV === "development" ? err : {}
+  console.error("Error:", err.stack || err.message)
+  const statusCode = err.status || 500
+  res.status(statusCode).json({
+    message: statusCode === 500 ? "Internal Server Error" : err.message,
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack })
   })
 })
 
 // ================= SERVER START =================
 
-app.listen(PORT, () => {
-  console.log("TEST LOG: Server is starting with console logging enabled")
+const server = app.listen(PORT, () => {
   console.log("\n======================================")
-  console.log(`Restaurant Backend Running`)
-  console.log(`Server: http://localhost:${PORT}`)
-  console.log(`Orders API: http://localhost:${PORT}/api/orders`)
-  console.log(`Items API: http://localhost:${PORT}/api/items`)
-  console.log(`Auth API: http://localhost:${PORT}/api/auth`)
-  console.log(`Menu API: http://localhost:${PORT}/api/menu`)
+  console.log(`  LaCasa Backend v2.0`)
+  console.log(`  Server: http://localhost:${PORT}`)
+  console.log(`  Env: ${process.env.NODE_ENV || "development"}`)
+  console.log(`  API: http://localhost:${PORT}/api`)
   console.log("======================================\n")
+})
+
+// ── Graceful Shutdown ──
+const shutdown = (signal) => {
+  console.log(`\n${signal} received. Shutting down gracefully...`)
+  server.close(() => {
+    console.log("Server closed.")
+    process.exit(0)
+  })
+  setTimeout(() => {
+    console.log("Forcing shutdown...")
+    process.exit(1)
+  }, 10000)
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"))
+process.on("SIGINT", () => shutdown("SIGINT"))
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err)
 })

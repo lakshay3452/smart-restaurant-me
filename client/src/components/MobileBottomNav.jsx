@@ -1,4 +1,4 @@
-import { Home, Utensils, Clock, ShoppingCart, User } from "lucide-react";
+import { Home, Utensils, Clock, ShoppingCart, Trophy } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
@@ -22,7 +22,7 @@ export default function MobileBottomNav() {
     { label: "Menu", icon: Utensils, action: () => navigate("/menu"), active: path === "/menu" },
     { label: "Orders", icon: Clock, action: () => navigate("/orders"), active: path === "/orders" },
     { label: "Cart", icon: ShoppingCart, action: () => navigate("/cart"), active: path === "/cart", badge: cartCount },
-    { label: "Profile", icon: User, action: () => navigate(localStorage.getItem("token") ? "/profile" : "/login"), active: path === "/profile" || path === "/login" },
+    { label: "Rewards", icon: Trophy, action: () => navigate(localStorage.getItem("token") ? "/rewards" : "/login"), active: path === "/rewards" },
   ];
 
   return (

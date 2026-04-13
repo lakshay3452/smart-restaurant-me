@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Package, User, Mail, CalendarDays, Clock, Users, Phone } from "lucide-react";
+import { LogOut, Package, User, Mail, CalendarDays, Clock, Users, Phone, Trophy } from "lucide-react";
 import axios from "axios";
 
 export default function Profile() {
@@ -117,6 +117,13 @@ export default function Profile() {
                 {reservations.length}
               </span>
             )}
+          </button>
+          <button
+            onClick={() => navigate("/rewards")}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition bg-white/[0.06] text-white/50 hover:bg-white/[0.1]"
+          >
+            <Trophy size={16} />
+            Rewards
           </button>
         </div>
 
